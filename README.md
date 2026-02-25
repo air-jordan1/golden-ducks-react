@@ -1,3 +1,5 @@
+This is the spring 2026 Software Development project of George, Kenneth, Jordan, and Eunice. https://goldenducks-6f2df.web.app is the url of the hosted website. A good tool for testing html features is https://htmlcheatsheet.com/
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
