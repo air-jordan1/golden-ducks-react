@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import TypingDrill from "./pages/TypingDrill";
 import Account from "./pages/Account";
+import Settings from "./pages/Settings"
+
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Route path="/welcome/:name" element={<Welcome />} />
         <Route path="/typing-drill" element={<TypingDrill />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/settings" element={<Settings />} />
+
       </Routes>
     </BrowserRouter>
   );
