@@ -62,7 +62,7 @@ function InputField(props) {
 };
 
 function TypingDrill() {
-  const [stage, setStage] = useState(STATES.INTRO);
+  const [state, setState] = useState(STATES.INTRO);
 
   const [userInput, setUserInput] = useState('');
   const inputRef = useRef(null);
@@ -87,10 +87,10 @@ function TypingDrill() {
   }, [isRunning]);
   // Focus the input field when the stage changes to RUNNING
   useEffect(() => {
-    if (stage === STATES.RUNNING) {
+    if (state === STATES.RUNNING) {
       inputRef.current?.focus();
     }
-  }, [stage]);
+  }, [state]);
 
   const handleKeyDown = useCallback((event) => {
     if (!isRunning) {
@@ -100,14 +100,14 @@ function TypingDrill() {
   }, [isRunning]);
 
   function handleStart() {
-    setStage(STATES.RUNNING);
+    setState(STATES.RUNNING);
   };
 
   function handleSubmit() {
     setIsRunning(false);
     const val = inputRef.current.value;
     setUserInput(val);
-    setStage(STATES.RESULTS);
+    setState(STATES.RESULTS);
   };
 
   //Start of rendering the page
@@ -115,16 +115,19 @@ function TypingDrill() {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
+      //alignItems: 'center',
+      //justifyContent: 'center',
       height: '100vh',
       background: 'linear-gradient(to right, #45a247, #283c86)',
       color: 'white'
     }}>
+      <NavMenu />
       <HeaderArea />
-      {stage === STATES.INTRO && <TypingDrillIntro onStart={handleStart} />}
-      {stage === STATES.RUNNING && <TypingDrillRunning time={time} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} currentPassage={currentPassage} />}
-      {stage === STATES.RESULTS && <TypingDrillResults userInput={userInput} time={time} currentPassage={currentPassage} />}
+      <div style={contentStyle}>
+        {state === STATES.INTRO && <TypingDrillIntro onStart={handleStart} />}
+        {state === STATES.RUNNING && <TypingDrillRunning time={time} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} currentPassage={currentPassage} />}
+        {state === STATES.RESULTS && <TypingDrillResults userInput={userInput} time={time} currentPassage={currentPassage} />}
+      </div>
     </div>
   );
 };
@@ -137,9 +140,23 @@ function Button(props) {
 
 function HeaderArea() {
   return (
-    <h1>Typing Drill</h1>
+    <h1 style={headerStyle}>Typing Drill</h1>
   );
 }; 
+
+const headerStyle = {
+  fontSize: '48px',
+  fontWeight: 'bold',
+  marginBottom: '20px',
+  marginLeft: '100px',
+};
+
+const contentStyle = {
+  contentAlign: 'center',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+};
 
 const buttonStyle = {
   backgroundColor: '#4CAF50',
@@ -176,6 +193,38 @@ const ghostTextStyle = {
   fontSize: '16px',
   pointerEvents: 'none',
   zIndex: 1
-}
+};
+
+const navStyle = {
+  alignSelf: 'center',
+  borderBottom: '1px solid white',
+  width: '100%',
+  padding: '10px',
+  marginBottom: '20px',
+  display: 'inline-flex',
+  justifyContent: 'center',
+  width: 'fit-content',
+};
+
+function NavMenu() {
+  return (
+    <nav style={navStyle}>
+      <ul style={{ display: 'flex', justifyContent: 'center', padding: 0, margin: 0 }}>
+        <NavButton href="/" text="Home" />
+        <NavButton href="/typing-drill" text="Typing Drill" />
+        <NavButton href="/account" text="Account" />
+        <NavButton href="/settings" text="Settings" />
+      </ul>
+    </nav>
+  );
+};
+
+function NavButton(props) {
+  return (
+    <li style={{ listStyleType: 'none'}}>
+      <Button href={props.href} text={props.text}/>
+    </li>
+  );
+};
 
 export default TypingDrill;
