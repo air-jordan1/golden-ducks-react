@@ -20,6 +20,8 @@ function Welcome() {
         <Link to="/"><button style={buttonStyle}>Home</button></Link>
         <Link to="/typing-drill"><button style={buttonStyle}>Typing Drill</button></Link>
         <Link to="/account"><button style={buttonStyle}>Account</button></Link>
+        <Link to="/settings"><button style={buttonStyle}>Settings</button></Link>
+
       </div>
     </div>
   );
