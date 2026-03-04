@@ -38,7 +38,7 @@ function Settings() {
       </div>
     )
   }
-  
+
   return (
     <div>
       <h1>Settings</h1>
