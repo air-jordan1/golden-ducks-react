@@ -1,40 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
-function TypingDrillPage() {
-  const [started, setStarted] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+const STATES = {
+  INTRO: 'intro',
+  RUNNING: 'running',
+  RESULTS: 'results'
+};
+
+function TypingDrill() {
+  const [stage, setStage] = useState(STATES.INTRO);
+  const [userInput, setUserInput] = useState('');
+  const inputRef = useRef(null);
+  const currentPassage = "Jesus wept.";
 
   function handleStart() {
-    setStarted(true);
+    setStage(STATES.RUNNING);
   };
 
   function handleSubmit() {
-    setSubmitted(true);
-  }
-
-  function TypingDrillIntro() {
-    return started ? (
-      <div>
-        <p>You will be timed from the moment you start typing.</p>
-        <div>
-            <div name="results"></div>
-            <InputField />
-            <Button text="submit" onclick={handleSubmit} />
-        </div>
-      </div>
-    ) : <TypingDrillRunning />;
+    const val = inputRef.current.value;
+    setUserInput(val);
+    console.log('saved:', val);
+    setStage(STATES.RESULTS);
   };
 
-  function TypingDrillRunning() {
+  function ManageDrillState() {
+    switch (stage) {
+      case STATES.INTRO:
+        return <TypingDrillIntro />;
+      case STATES.RUNNING:
+        return <TypingDrillRunning />;
+      case STATES.RESULTS:
+        return <TypingDrillResults />;
+      default:
+        return <TypingDrillIntro />;
+    }
+  };
+
+  function TypingDrillIntro() {
     return (
       <div>
         <p>Press start to begin typing.</p>
         <Button text="Start" onclick={handleStart} />
       </div>
     );
-  }
+  };
 
-  
+  function TypingDrillRunning() {
+    return (
+      <div>
+        <p>You will be timed from the moment you start typing. - tentative</p>
+        <div>
+            <div name="results"></div>
+            <InputField inputRef={inputRef}/>
+            <Button text="submit" onclick={handleSubmit} />
+        </div>
+      </div>
+    );
+  };
+
+  function TypingDrillResults() {
+    return (
+      <div>
+        <p>You typed: {userInput}</p>
+        <p>The correct text is: {currentPassage}</p>
+      </div>
+    );
+  };
+
+  function InputField() {
+    return (
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+        <div style={ghostTextStyle}> Jesus wept. </div>
+        <input ref={inputRef} name="drillInput" type="text" style={inputStyle} />
+      </div>
+    );
+  };
 
   //Start of rendering the page
   return (
@@ -48,17 +88,8 @@ function TypingDrillPage() {
       color: 'white'
     }}>
       <HeaderArea />
-      <TypingDrillIntro />
+      <ManageDrillState />
     </div>
-  );
-};
-
-function InputField() {
-  return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <div style={ghostTextStyle}> Jesus wept. </div>
-      <input name="drillInput" type="text" style={inputStyle} />
-  </div>
   );
 };
 
@@ -111,4 +142,4 @@ const ghostTextStyle = {
   zIndex: 1
 }
 
-export default TypingDrillPage;
+export default TypingDrill;
