@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function Settings() {
+  const [selectedApi, setSelectedApi] = useState(bibleApis[0]);
   const bibleApis = ['ESV API', 'KJV API', 'Mormon Bible API'];
   return (
     <div>
