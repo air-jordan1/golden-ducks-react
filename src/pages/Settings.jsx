@@ -2,8 +2,8 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 function Settings() {
-  const [selectedApi, setSelectedApi] = useState(bibleApis[0]);
   const bibleApis = ['ESV API', 'KJV API', 'Mormon Bible API'];
+  const [selectedApi, setSelectedApi] = useState(bibleApis[0]);
 
   function FetchTranslation() {
     fetch('https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books/john/chapters/3/verses/16.json)', []);
