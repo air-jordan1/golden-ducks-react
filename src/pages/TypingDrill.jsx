@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import DemoPassage from './Settings';
 
 const STATES = {
   INTRO: 'intro',
@@ -21,7 +22,7 @@ function TypingDrillRunning(props) {
         <p>You will be timed from the moment you start typing. {props.time}s elapsed.</p>
         <div>
             <div name="results"></div>
-            <InputField inputRef={props.inputRef} handleKeyDown={props.handleKeyDown} handleSubmit={props.handleSubmit} />
+            <InputField inputRef={props.inputRef} handleKeyDown={props.handleKeyDown} handleSubmit={props.handleSubmit} currentPassage={props.currentPassage} />
             <Button text="submit" onClick={props.handleSubmit} />
         </div>
       </div>
@@ -48,7 +49,7 @@ function InputField(props) {
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
-      <div style={ghostTextStyle}> Jesus wept. </div>
+      <div style={ghostTextStyle}> { props.currentPassage } </div>
       <input 
         ref={props.inputRef} 
         name="drillInput" 
@@ -66,6 +67,7 @@ function TypingDrill() {
   const [userInput, setUserInput] = useState('');
   const inputRef = useRef(null);
   const currentPassage = "Jesus wept.";
+  
 
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
@@ -121,7 +123,7 @@ function TypingDrill() {
     }}>
       <HeaderArea />
       {stage === STATES.INTRO && <TypingDrillIntro onStart={handleStart} />}
-      {stage === STATES.RUNNING && <TypingDrillRunning time={time} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} />}
+      {stage === STATES.RUNNING && <TypingDrillRunning time={time} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} currentPassage={currentPassage} />}
       {stage === STATES.RESULTS && <TypingDrillResults userInput={userInput} time={time} currentPassage={currentPassage} />}
     </div>
   );
