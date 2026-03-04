@@ -3,23 +3,24 @@ import { useEffect, useState } from 'react';
 
 function Settings() {
 
-  var passage;
-  const bibleApis = ['ASV', 'Geneva', 'KJV'];
-
   function Translation() {
+
   }
 
   function TranslationController() {
+    const bibleApis = ['ASV', 'Geneva', 'KJV'];
+    const [selectedApi, setSelectedApi] = useState(bibleApis[0]);
+
     function GetTranslation() {
-      useEffect( () =>
-        fetch('https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books/john/chapters/3/verses/16.json)', [])
-        .then((response) => response.json())
-        .then((data) => passage = data.text )
-        , [])
+
     }
 
-    function ChangeTranslation() {
-
+    function ChangeTranslation(selectedApi) {
+      useEffect(() => { 
+        const api = fetch("https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-asv/books/john/chapters/3/verses/16.json", [])
+        .then((response) => {return response.json()});
+        
+      }, [selectedApi]);
     }
 
     return (
@@ -40,7 +41,6 @@ function Settings() {
     <div>
       <h1>Settings</h1>
       <TranslationController />
-      <p>{passage}</p>
     </div>
   );
 }
