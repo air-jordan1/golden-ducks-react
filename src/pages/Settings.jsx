@@ -8,10 +8,10 @@ function Settings() {
     const [selectedApi, setSelectedApi] = useState(null); // actual text
 
     useEffect(() => { 
-      const api = fetch("https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-asv/books/john/chapters/3/verses/16.json")
+      const api = fetch("https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-" + version + "/books/john/chapters/3/verses/16.json")
       .then((response) => response.json())
       .then((data) => setSelectedApi(data.text))
-      }, []);
+      }, [version]);
 
     const handleSelection = (event) => {
       setVersion(event.target.value);
