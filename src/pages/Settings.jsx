@@ -7,19 +7,15 @@ function Settings() {
     const [version, setVersion] = useState(selectorOptions[0]); // version
     const [selectedApi, setSelectedApi] = useState(null); // actual text
 
+    useEffect(() => { 
+      const api = fetch("https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-asv/books/john/chapters/3/verses/16.json")
+      .then((response) => response.json())
+      .then((data) => setSelectedApi(data.text))
+      }, []);
+
     const handleSelection = (event) => {
       setVersion(event.target.value);
-      changeTranslation(version);
     };
-
-    function changeTranslation(version) {
-      useEffect(() => { 
-        const api = fetch("https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-" + version + "/books/john/chapters/3/verses/16.json", []);
-        const passage = api.json().text;
-        console.log(passage);
-        setSelectedApi(passage);
-      }, [version]);
-    }
 
     function DemoPassage() {
       return selectedApi;
