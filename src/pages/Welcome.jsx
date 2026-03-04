@@ -1,43 +1,31 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import "../App.css"; 
+import BackButton from "./components/BackButton"; 
 
 function Welcome() {
-  const { name } = useParams();
+  const { email } = useParams();
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      background: 'linear-gradient(to right, #45a247, #283c86)',
-      color: 'white'
-    }}>
-      <h1>Welcome, {name}!</h1>
-      <h2>What do you want to learn?</h2>
-      <div>
-        <Link to="/"><button style={buttonStyle}>Home</button></Link>
-        <Link to="/typing-drill"><button style={buttonStyle}>Typing Drill</button></Link>
-        <Link to="/account"><button style={buttonStyle}>Account</button></Link>
-        <Link to="/settings"><button style={buttonStyle}>Settings</button></Link>
+    <div className="page-container">
+      <div className="modern-card welcome-card">
+
+        <h2 className="label-text">Signed in as</h2>
+        <h1 className="email-display">{email}</h1>
+
+        <h3 className="subtitle" style={{ color: '#111827', fontWeight: '600', marginBottom: '24px' }}>
+          What do you want to learn?
+        </h3>
+        
+        <div className="button-group">
+          <Link to="/" className="btn-modern">Home</Link>
+          <Link to="/typing-drill" className="btn-modern">Typing Drill</Link>
+          <Link to="/account" className="btn-modern">Account</Link>
+        </div>
+        
       </div>
     </div>
   );
 }
-
-const buttonStyle = {
-  backgroundColor: '#4CAF50',
-  border: 'none',
-  color: 'white',
-  padding: '15px 32px',
-  textAlign: 'center',
-  textDecoration: 'none',
-  display: 'inline-block',
-  fontSize: '16px',
-  margin: '4px 2px',
-  cursor: 'pointer',
-  borderRadius: '12px',
-};
 
 export default Welcome;
