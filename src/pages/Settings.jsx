@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 function Settings() {
-  const bibleApis = ['ESV API', 'KJV API', 'Mormon Bible API'];
+  const bibleApis = ['ASV', 'Geneva', 'KJV'];
   const [selectedApi, setSelectedApi] = useState(bibleApis[0]);
 
   function FetchTranslation() {
