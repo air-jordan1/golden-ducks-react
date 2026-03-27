@@ -216,17 +216,24 @@ function HeaderArea() {
 
 function TypingDrillRunning(props) {
   return (
-    <div style={{ width: '100%', textAlign: 'center' }}>
-      <p className="label-text" style={{ marginBottom: '24px' }}>Time: {props.time}s</p>
-      <div style={{ marginBottom: '32px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <InputField
-          inputRef={props.inputRef}
-          handleKeyDown={props.handleKeyDown}
-          handleSubmit={props.handleSubmit}
-          currentPassage={props.currentPassage}
-        />
+    <div style={{ width: '100%' }}>
+      <p className="label-text" style={{ marginBottom: '8px', textAlign: 'center' }}>Time: {props.time}s</p>
+
+      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
+        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }}>
+          {props.currentPassage}
+        </p>
       </div>
-      <button className="btn-modern" onClick={props.handleSubmit}>Submit Result</button>
+
+      <InputField
+        inputRef={props.inputRef}
+        handleKeyDown={props.handleKeyDown}
+        handleSubmit={props.handleSubmit}
+      />
+
+      <button className="btn-modern" onClick={props.handleSubmit} style={{ marginTop: '16px', width: '100%' }}>
+        Submit Result
+      </button>
     </div>
   );
 }
@@ -256,45 +263,30 @@ function InputField(props) {
   }, [props]);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block', width: '100%', maxWidth: '300px', textAlign: 'left' }}>
-      <div style={ghostTextStyle}>{props.currentPassage}</div>
-      <input
-        ref={props.inputRef}
-        name="drillInput"
-        type="text"
-        style={inputStyle}
-        onKeyDown={handleInputKey}
-        autoComplete="off"
-        spellCheck="false"
-      />
-    </div>
+    <textarea
+      ref={props.inputRef}
+      name="drillInput"
+      rows={4}
+      placeholder="Start typing here..."
+      style={{
+        width: '100%',
+        padding: '12px',
+        borderRadius: '12px',
+        border: '1px solid #e5e7eb',
+        backgroundColor: '#f9fafb',
+        fontSize: '16px',
+        color: '#111827',
+        fontFamily: 'inherit',
+        outline: 'none',
+        resize: 'none',
+        boxSizing: 'border-box',
+        lineHeight: '1.6',
+      }}
+      onKeyDown={handleInputKey}
+      autoComplete="off"
+      spellCheck="false"
+    />
   );
 }
-
-const inputStyle = {
-  backgroundColor: 'transparent',
-  border: 'none',
-  borderBottom: '2px solid #e5e7eb',
-  color: '#111827',
-  padding: '12px 0',
-  fontSize: '18px',
-  fontFamily: 'inherit',
-  outline: 'none',
-  width: '100%',
-  position: 'relative',
-  zIndex: 2,
-  transition: 'border-color 0.2s ease',
-};
-
-const ghostTextStyle = {
-  position: 'absolute',
-  top: '12px',
-  left: '0',
-  color: '#9ca3af',
-  fontSize: '18px',
-  pointerEvents: 'none',
-  zIndex: 1,
-  whiteSpace: 'nowrap',
-};
 
 export default TypingDrill;
