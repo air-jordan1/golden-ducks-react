@@ -21,6 +21,7 @@ function Welcome() {
           <Link to="/" className="btn-modern">Home</Link>
           <Link to="/typing-drill" className="btn-modern">Typing Drill</Link>
           <Link to="/account" className="btn-modern">Account</Link>
+          <Link to="/settings" className="btn-modern">Settings</Link>
         </div>
         
       </div>
