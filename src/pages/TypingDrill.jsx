@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../App.css';
 import BackButton from "./components/BackButton";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore";
 
 const STATES = {
   INTRO: 'intro',
@@ -18,11 +18,22 @@ function parseReference(ref) {
   return { book, chapter: match[2], verse: match[3] };
 }
 
+function calcAccuracy(typed, target) {
+  if (!target.length) return 0;
+  let correct = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === target[i]) correct++;
+  }
+  return Math.round((correct / target.length) * 100);
+}
+
 function TypingDrill() {
   const [state, setState] = useState(STATES.INTRO);
   const [userInput, setUserInput] = useState('');
   const [currentPassage, setCurrentPassage] = useState('');
+  const [currentReference, setCurrentReference] = useState('');
   const [translation, setTranslation] = useState('kjv');
+  const [accuracy, setAccuracy] = useState(0);
   const inputRef = useRef(null);
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
@@ -31,7 +42,7 @@ function TypingDrill() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
-    getDoc(doc(db, "users", user.uid))
+    getDoc(doc(db, "users", user.email))
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
           setTranslation(snap.data().preferredTranslation);
@@ -60,27 +71,38 @@ function TypingDrill() {
     }
   }, [isRunning]);
 
-  function handleStart(passageText) {
+  function handleStart(passageText, reference) {
     setCurrentPassage(passageText);
+    setCurrentReference(reference);
     setState(STATES.RUNNING);
   }
 
   async function handleSubmit() {
     setIsRunning(false);
     const val = inputRef.current.value;
+    const acc = calcAccuracy(val, currentPassage);
     setUserInput(val);
+    setAccuracy(acc);
     setState(STATES.RESULTS);
 
     const user = auth.currentUser;
     if (user) {
       await addDoc(collection(db, "drillResults"), {
-        userId: user.uid,
+        userId: user.email,
         passage: currentPassage,
+        reference: currentReference,
         userInput: val,
         timeTaken: time,
+        accuracy: acc,
         translation,
         completedAt: new Date(),
       });
+
+      if (acc === 100 && currentReference) {
+        await updateDoc(doc(db, "users", user.email), {
+          memorizedVerses: arrayUnion(currentReference),
+        });
+      }
     }
   }
 
@@ -107,6 +129,7 @@ function TypingDrill() {
             <TypingDrillResults
               userInput={userInput}
               time={time}
+              accuracy={accuracy}
               currentPassage={currentPassage}
             />
           )}
@@ -184,7 +207,7 @@ function TypingDrillIntro({ onStart, translation }) {
           <button
             className="btn-modern"
             style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none' }}
-            onClick={() => onStart(fetchedText)}
+            onClick={() => onStart(fetchedText, reference)}
           >
             Start Typing Drill
           </button>
@@ -239,16 +262,28 @@ function TypingDrillRunning(props) {
 }
 
 function TypingDrillResults(props) {
+  const accuracyColor = props.accuracy >= 90 ? '#10b981' : props.accuracy >= 70 ? '#f59e0b' : '#ef4444';
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
       <h2 className="title" style={{ fontSize: '24px', marginBottom: '24px' }}>Results</h2>
-      <div style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '12px', marginBottom: '24px' }}>
-        <p className="label-text">You typed:</p>
-        <p style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: '0 0 16px 0' }}>"{props.userInput}"</p>
-        <p className="label-text">Target text:</p>
-        <p style={{ fontSize: '16px', color: '#6b7280', margin: '0' }}>"{props.currentPassage}"</p>
+
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '24px' }}>
+        <div style={{ backgroundColor: '#f9fafb', padding: '16px 24px', borderRadius: '12px', flex: 1 }}>
+          <p className="label-text" style={{ margin: '0 0 4px 0' }}>Time</p>
+          <p style={{ fontSize: '22px', fontWeight: '700', color: '#10b981', margin: 0 }}>{props.time}s</p>
+        </div>
+        <div style={{ backgroundColor: '#f9fafb', padding: '16px 24px', borderRadius: '12px', flex: 1 }}>
+          <p className="label-text" style={{ margin: '0 0 4px 0' }}>Accuracy</p>
+          <p style={{ fontSize: '22px', fontWeight: '700', color: accuracyColor, margin: 0 }}>{props.accuracy}%</p>
+        </div>
       </div>
-      <p className="title" style={{ fontSize: '20px', color: '#10b981' }}>Time: {props.time} seconds</p>
+
+      <div style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '12px', textAlign: 'left' }}>
+        <p className="label-text">You typed:</p>
+        <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{props.userInput}"</p>
+        <p className="label-text">Target:</p>
+        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{props.currentPassage}"</p>
+      </div>
     </div>
   );
 }

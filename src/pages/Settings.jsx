@@ -17,7 +17,7 @@ function Settings() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
-    getDoc(doc(db, "users", user.uid))
+    getDoc(doc(db, "users", user.email))
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
           setTranslation(snap.data().preferredTranslation);
@@ -41,7 +41,7 @@ function Settings() {
     if (!user) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
+      await updateDoc(doc(db, "users", user.email), { preferredTranslation: val });
     } catch (err) {
       console.error("Error saving translation:", err);
     } finally {
