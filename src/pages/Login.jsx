@@ -1,8 +1,9 @@
 import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { auth, provider } from "../firebase";
+import { auth, provider, db } from "../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../App.css"; 
+import "../App.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,9 +17,26 @@ const Login = () => {
     }
   };
 
+  const createUserProfileIfNew = async (user) => {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        email: user.email,
+        preferredTranslation: "kjv",
+        createdAt: new Date(),
+      });
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.email) {
+        try {
+          await createUserProfileIfNew(user);
+        } catch (error) {
+          console.error("Error creating user profile:", error);
+        }
         navigate(`/welcome/${encodeURIComponent(user.email)}`);
       } else {
         setIsCheckingAuth(false);
