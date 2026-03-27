@@ -21,14 +21,14 @@ function Account() {
 
     async function loadData() {
       try {
-        const userSnap = await getDoc(doc(db, "users", user.email));
+        const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists()) {
           setProfile(userSnap.data());
         }
 
         const q = query(
           collection(db, "drillResults"),
-          where("userId", "==", user.email)
+          where("userId", "==", user.uid)
         );
         const snap = await getDocs(q);
         const results = snap.docs

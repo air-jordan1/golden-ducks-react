@@ -18,7 +18,7 @@ const Login = () => {
   };
 
   const createUserProfileIfNew = async (user) => {
-    const userRef = doc(db, "users", user.email);
+    const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
       await setDoc(userRef, {

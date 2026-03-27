@@ -42,7 +42,7 @@ function TypingDrill() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
-    getDoc(doc(db, "users", user.email))
+    getDoc(doc(db, "users", user.uid))
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
           setTranslation(snap.data().preferredTranslation);
@@ -87,21 +87,25 @@ function TypingDrill() {
 
     const user = auth.currentUser;
     if (user) {
-      await addDoc(collection(db, "drillResults"), {
-        userId: user.email,
-        passage: currentPassage,
-        reference: currentReference,
-        userInput: val,
-        timeTaken: time,
-        accuracy: acc,
-        translation,
-        completedAt: new Date(),
-      });
-
-      if (acc === 100 && currentReference) {
-        await updateDoc(doc(db, "users", user.email), {
-          memorizedVerses: arrayUnion(currentReference),
+      try {
+        await addDoc(collection(db, "drillResults"), {
+          userId: user.uid,
+          passage: currentPassage,
+          reference: currentReference,
+          userInput: val,
+          timeTaken: time,
+          accuracy: acc,
+          translation,
+          completedAt: new Date(),
         });
+
+        if (acc === 100 && currentReference) {
+          await updateDoc(doc(db, "users", user.uid), {
+            memorizedVerses: arrayUnion(currentReference),
+          });
+        }
+      } catch (err) {
+        console.error("Firestore write failed:", err);
       }
     }
   }
