@@ -48,28 +48,81 @@ const Login = () => {
 
   if (isCheckingAuth) {
     return (
-      <div className="page-container">
-        <p className="loading-text">Checking authentication...</p>
+      <div className="landing-loading">
+        <p className="loading-text">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="page-container">
-      <div className="modern-card">
-        <h2 className="title">Sign In</h2>
-        <p className="subtitle">Welcome back. Please sign in to continue.</p>
-        
-        <button onClick={handleGoogleSignIn} className="btn-google">
-          <svg className="google-icon" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-          </svg>
-          Continue with Google
-        </button>
-      </div>
+    <div className="landing-page">
+      {/* Navbar */}
+      <nav className="landing-nav">
+        <div className="nav-left">
+          <span className="nav-logo">Scripturize</span>
+          <span className="nav-link">Study tools</span>
+          <span className="nav-link">Translations</span>
+        </div>
+        <div className="nav-center">
+          <div className="nav-search">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ flexShrink: 0, color: '#9ca3af' }}>
+              <circle cx="11" cy="11" r="8" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35" />
+            </svg>
+            <span>Search for verses...</span>
+          </div>
+        </div>
+        <div className="nav-right">
+          <button className="nav-btn-outline" onClick={handleGoogleSignIn}>Log in</button>
+          <button className="nav-btn-primary" onClick={handleGoogleSignIn}>Sign up for free</button>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="landing-hero">
+        <h1 className="hero-title">
+          How do you want to<br />memorize Scripture?
+        </h1>
+        <p className="hero-subtitle">
+          Master the Word with Scripturize's interactive typing drills,<br />
+          accuracy tracking, and verse memory tools.
+        </p>
+        <button className="hero-cta" onClick={handleGoogleSignIn}>Sign up for free</button>
+        <button className="hero-secondary" onClick={handleGoogleSignIn}>Already have an account? Log in</button>
+      </section>
+
+      {/* Feature Cards */}
+      <section className="landing-features">
+        <div className="feature-card feature-blue">
+          <h3>Typing Drills</h3>
+          <p>Type out Bible verses from memory to reinforce deep retention</p>
+        </div>
+        <div className="feature-card feature-orange">
+          <h3>Accuracy Tracking</h3>
+          <div className="feature-stats">
+            <div className="stat-item">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">98%</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Verses</span>
+              <span className="stat-value">24</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Time</span>
+              <span className="stat-value">4m</span>
+            </div>
+          </div>
+        </div>
+        <div className="feature-card feature-lightblue">
+          <h3>Translation Support</h3>
+          <p>Study in KJV or ASV — choose the translation that works for you</p>
+        </div>
+        <div className="feature-card feature-yellow">
+          <h3>Memory Vault</h3>
+          <p>Every verse you type perfectly gets saved to your memory vault</p>
+        </div>
+      </section>
     </div>
   );
 };
