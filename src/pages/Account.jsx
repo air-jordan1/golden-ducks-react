@@ -64,73 +64,81 @@ function Account() {
 
   return (
     <div className="page-container">
-      <div className="modern-card">
+      <div className="modern-card account-card">
         <BackButton />
 
         <h1 className="title">Account</h1>
 
-        {profile && (
-          <div style={{ marginBottom: '24px' }}>
-            <p className="label-text">Email</p>
-            <p style={{ fontWeight: '600', color: '#111827' }}>{profile.email}</p>
-            <p className="label-text" style={{ marginTop: '8px' }}>Preferred Translation</p>
-            <p style={{ fontWeight: '600', color: '#111827', textTransform: 'uppercase' }}>{profile.preferredTranslation}</p>
-          </div>
-        )}
-
-        {profile?.memorizedVerses?.length > 0 && (
-          <div style={{ marginBottom: '32px' }}>
-            <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
-              Memorized Verses
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {profile.memorizedVerses.map(ref => (
-                <div key={ref} style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f0fdf4', padding: '12px 16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                  <span style={{ fontSize: '18px' }}>✓</span>
-                  <p style={{ margin: 0, fontWeight: '600', color: '#111827' }}>{ref}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
-          Drill History ({drillResults.length})
-        </h2>
-
-        {drillResults.length === 0 ? (
-          <p className="label-text">No drills completed yet.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-            {drillResults.map(result => (
-              <div key={result.id} style={{ backgroundColor: '#f9fafb', padding: '16px', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <p style={{ margin: 0, fontSize: '14px', color: '#6b7280' }}>
-                    {result.completedAt?.toDate().toLocaleDateString()}
-                  </p>
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <span style={{ fontSize: '14px', color: '#10b981', fontWeight: '600' }}>{result.timeTaken}s</span>
-                    {result.accuracy != null && (
-                      <span style={{ fontSize: '14px', fontWeight: '600', color: result.accuracy >= 90 ? '#10b981' : result.accuracy >= 70 ? '#f59e0b' : '#ef4444' }}>
-                        {result.accuracy}%
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#111827' }}>
-                  <strong>Target:</strong> "{result.passage}"
-                </p>
-                <p style={{ margin: '0', fontSize: '14px', color: '#111827' }}>
-                  <strong>Typed:</strong> "{result.userInput}"
-                </p>
+        <div className="account-columns">
+          {/* Left column */}
+          <div className="account-col-left">
+            {profile && (
+              <div style={{ marginBottom: '24px' }}>
+                <p className="label-text">Email</p>
+                <p style={{ fontWeight: '600', color: '#111827' }}>{profile.email}</p>
+                <p className="label-text" style={{ marginTop: '8px' }}>Preferred Translation</p>
+                <p style={{ fontWeight: '600', color: '#111827', textTransform: 'uppercase' }}>{profile.preferredTranslation}</p>
               </div>
-            ))}
-          </div>
-        )}
+            )}
 
-        <button onClick={handleSignOut} className="btn-danger">
-          Sign Out
-        </button>
+            {profile?.memorizedVerses?.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
+                  Memorized Verses
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {profile.memorizedVerses.map(ref => (
+                    <div key={ref} style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f0fdf4', padding: '12px 16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                      <span style={{ fontSize: '18px' }}>✓</span>
+                      <p style={{ margin: 0, fontWeight: '600', color: '#111827' }}>{ref}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button onClick={handleSignOut} className="btn-danger">
+              Sign Out
+            </button>
+          </div>
+
+          {/* Right column */}
+          <div className="account-col-right">
+            <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
+              Drill History ({drillResults.length})
+            </h2>
+
+            {drillResults.length === 0 ? (
+              <p className="label-text">No drills completed yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {drillResults.map(result => (
+                  <div key={result.id} style={{ backgroundColor: '#f9fafb', padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <p style={{ margin: 0, fontSize: '14px', color: '#6b7280' }}>
+                        {result.completedAt?.toDate().toLocaleDateString()}
+                      </p>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <span style={{ fontSize: '14px', color: '#10b981', fontWeight: '600' }}>{result.timeTaken}s</span>
+                        {result.accuracy != null && (
+                          <span style={{ fontSize: '14px', fontWeight: '600', color: result.accuracy >= 90 ? '#10b981' : result.accuracy >= 70 ? '#f59e0b' : '#ef4444' }}>
+                            {result.accuracy}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#111827' }}>
+                      <strong>Target:</strong> "{result.passage}"
+                    </p>
+                    <p style={{ margin: '0', fontSize: '14px', color: '#111827' }}>
+                      <strong>Typed:</strong> "{result.userInput}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

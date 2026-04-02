@@ -51,7 +51,7 @@ function Settings() {
 
   return (
     <div className="page-container">
-      <div className="modern-card">
+      <div className="modern-card settings-card">
         <BackButton />
 
         <h1 className="title">Settings</h1>

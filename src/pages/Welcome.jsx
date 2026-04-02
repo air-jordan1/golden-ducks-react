@@ -64,7 +64,7 @@ function Welcome() {
             </svg>
           </div>
           <h3>Typing Drill</h3>
-          <p>Choose a verseand type it from memory to sharpen retention</p>
+          <p>Choose a verse and type it from memory to sharpen retention</p>
           <span className="dashboard-card-arrow">→</span>
         </Link>
 

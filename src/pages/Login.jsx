@@ -99,22 +99,9 @@ const Login = () => {
         </div>
         <div className="feature-card feature-orange">
           <h3>Accuracy Tracking</h3>
-          <div className="feature-stats">
-            <div className="stat-item">
-              <span className="stat-label">Score</span>
-              <span className="stat-value">98%</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Verses</span>
-              <span className="stat-value">24</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Time</span>
-              <span className="stat-value">4m</span>
-            </div>
-          </div>
+          <p>Monitor your progress and improve your memorization skills</p>
         </div>
-        <div className="feature-card feature-lightblue">
+        <div className="feature-card feature-purple">
           <h3>Translation Support</h3>
           <p>Study in KJV or ASV — choose the translation that works for you</p>
         </div>

@@ -476,6 +476,26 @@ body {
   padding: 60px 40px;
 }
 
+.settings-card {
+  max-width: 600px;
+}
+
+.account-card {
+  max-width: 900px;
+}
+
+.account-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  text-align: left;
+}
+
+.account-col-right {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
 h1, h2, h3, h4, p, span, a {
   color: #1a1209;
 }
