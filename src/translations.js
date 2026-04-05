@@ -1,9 +1,10 @@
 import { addDoc, collection } from "firebase/firestore";
+import { db } from './firebase';
 
 async function getBibles() {
     const response = await fetch('https://rest.api.bible/v1/bibles', {
         headers: {
-            'api-key': process.env.BIBLE_API_KEY
+            'api-key': import.meta.env.VITE_BIBLE_API_KEY
         }
     })
 
@@ -11,10 +12,14 @@ async function getBibles() {
 
     const bibleData = bibles.data;
 
-    try {
-        const list = await addDoc(collection(db, "translations"), bibleData);
-        console.log("Doc ID: ", list.id);
-    } catch (e) {
-        console.error("Error, lol: ", e);
-    };
+    for (let i = 0; i < bibleData.length; i++) {
+        try {
+            const list = await addDoc(collection(db, "translations"), bibleData[i]);
+            console.log("Doc ID: ", list.id);
+        } catch (e) {
+            console.error("Error, lol: ", e);
+        };
+    }
 }
+
+// getBibles();
