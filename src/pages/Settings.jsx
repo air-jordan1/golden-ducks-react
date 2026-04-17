@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, getPersistentCacheIndexManager, query
 import { getPreferredTranslation, setPreferredTranslation, getTranslationId } from '../User.js'
 import "../App.css";
 
+// holds translation options
 const TRANSLATIONS = {
   ASV: 'ASV — American Standard Version',
   CSB: 'CSB - Christian Standard Bible',
@@ -12,16 +13,22 @@ const TRANSLATIONS = {
   NLT: 'NLT - New Living Translation'
 };
 
+/**
+ * Settings() React component
+ * @returns 
+ */
 function Settings() {
-  const [userSelection, setUserSelection] = useState('');
-  const [previewText, setPreviewText] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [userSelection, setUserSelection] = useState(''); // user's selected translation
+  const [previewText, setPreviewText] = useState(''); // romans 5:8 string
+  const [saving, setSaving] = useState(false); // track saving of preferred translation
 
+  // useEffect for intial page open
   useEffect(() => {
     getPreferredTranslation()
     .then(abbrev => setUserSelection(abbrev));
   }, []);
 
+  // useEffect for updating verse preview
   useEffect(() => {
     setPreviewText('Loading preview...');
     if(userSelection == '') return;
@@ -36,6 +43,11 @@ function Settings() {
     .catch(() => setPreviewText('Could not load preview.'));
   }, [userSelection]);
 
+  /**
+   * handleChange for saving user's selection
+   * @param {*} e 
+   * @returns 
+   */
   const handleChange = async (e) => {
       const user = auth.currentUser;
 
@@ -53,6 +65,7 @@ function Settings() {
       }
   };
 
+  // return UI components
   return (
     <div className="page-container">
       <div className="modern-card settings-card">

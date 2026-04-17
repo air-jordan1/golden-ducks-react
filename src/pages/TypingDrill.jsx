@@ -45,7 +45,11 @@ function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the wo
 
 const COMPLETION_THRESHOLD = 90;
 
-// Parse the Scripture reference
+/**
+ * Parses the user's chosen Scripture reference.
+ * @param {*} ref 
+ * @returns 
+ */
 function parseReference(ref) {
   const t = ref.trim();
   const bookSlug = (b) => b.toLowerCase().replace(/\s+/g, '-');
@@ -80,6 +84,11 @@ function parseReference(ref) {
   return null;
 }
 
+/**
+ * Converts parsed Scripture reference to USFM code.
+ * @param {*} parsed 
+ * @returns 
+ */
 function parsedRefToID(parsed) {
   let id = '';
   const book = map.get(parsed.book);
@@ -98,13 +107,17 @@ function parsedRefToID(parsed) {
   return id;
 }
 
-// Fetch the passage from the parsed reference
+/**
+ * Fetches the passage from the parsed reference.
+ * @param {*} parsed 
+ * @param {*} translation 
+ * @returns 
+ */
 async function fetchPassage(parsed, translation) {
-  // const base = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/${parsed.book}/chapters/${parsed.chapter}`;
 
   const bibleId = await getTranslationId(translation);
   const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
-  const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`
+  const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`;
   const id = parsedRefToID(parsed);
 
   if (parsed.type === 'verse') {
