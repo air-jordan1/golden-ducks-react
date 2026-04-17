@@ -104,22 +104,23 @@ async function fetchPassage(parsed, translation) {
 
   const bibleId = await getTranslationId(translation);
   const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
+  const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=false`
   const id = parsedRefToID(parsed);
 
   if (parsed.type === 'verse') {
-    const res = await fetch(`${base}/verses/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+    const res = await fetch(`${base}/verses/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
     return (await res.json()).data.content;
   }
 
   if (parsed.type === 'range') {
-    const res = await fetch(`${base}/passages/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+    const res = await fetch(`${base}/passages/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
     return (await res.json()).data.content;
   }
 
   if (parsed.type === 'chapter') {
-    const res = await fetch(`${base}/chapters/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+    const res = await fetch(`${base}/chapters/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
     return (await res.json()).data.content;
   }
@@ -131,6 +132,7 @@ async function fetchPassage(parsed, translation) {
 function cleanVerseNumbers(text) {
   return text
   .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
+  .replace('¶', '')
   .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
 }
 
