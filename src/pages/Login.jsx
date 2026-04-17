@@ -92,7 +92,7 @@ const Login = () => {
         </div>
         <div className="feature-card feature-purple">
           <h3>Translation Support</h3>
-          <p>Study in KJV or ASV — choose the translation that works for you</p>
+          <p>Study in the translation that works for you</p>
         </div>
         <div className="feature-card feature-yellow">
           <h3>Memory Vault</h3>
