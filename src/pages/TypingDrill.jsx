@@ -222,6 +222,15 @@ function TypingDrill() {
     setState(STATES.RUNNING);
   }
 
+  function handleBack() {
+    setUserInput('');
+    setAccuracy(0);
+    setLevelCompleted(false);
+    setIsRunning(false);
+    setTime(0);
+    setState(STATES.INTRO);
+  }
+
   async function handleSubmit() {
     setIsRunning(false);
     const val = cleanVerseNumbers(inputRef.current.value);
@@ -267,7 +276,7 @@ function TypingDrill() {
           await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
         }
 
-        if (currentLevel === 3 && acc === 100) {
+        if (currentLevel === 4 && acc >= COMPLETION_THRESHOLD) {
           await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
         }
       } catch (err) {
@@ -317,6 +326,7 @@ function TypingDrill() {
               handleSubmit={handleSubmit}
               currentPassage={currentPassage}
               level={currentLevel}
+              onBack={handleBack}
             />
           )}
           {state === STATES.RESULTS && (
@@ -480,7 +490,7 @@ function TypingDrillIntro({ onStart, translation }) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack }) {
   userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>
@@ -506,6 +516,9 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
 
       <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>
         Submit Result
+      </button>
+      <button className="btn-modern" onClick={onBack} style={{ marginTop: '10px', width: '100%' }}>
+        Back
       </button>
     </div>
   );
