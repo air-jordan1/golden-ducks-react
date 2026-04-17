@@ -265,7 +265,7 @@ function TypingDrill() {
           await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
         }
 
-        if (currentLevel === 3 && acc === 100) {
+        if (currentLevel === 4 && acc >= COMPLETION_THRESHOLD) {
           await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
         }
       } catch (err) {
