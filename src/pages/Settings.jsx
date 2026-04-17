@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from "../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import "../App.css";
 import BackButton from "./components/BackButton";
 
 const TRANSLATIONS = {
-  kjv: 'KJV — King James Version',
-  asv: 'ASV — American Standard Version',
+  KJV: 'KJV — King James Version',
+  ASV: 'ASV — American Standard Version',
 };
 
 function Settings() {
-  const [userSelection, setUserSelection] = useState('kjv');
-  const [translation, setTranslation] = useState('de4e12af7f28f599-02');
-  const [previewText, setPreviewText] = useState(null);
+  const [userSelection, setUserSelection] = useState('');
+  const [translation, setTranslation] = useState('');
+  const [previewText, setPreviewText] = useState('Loading preview...');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -22,37 +22,52 @@ function Settings() {
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
           setUserSelection(snap.data().preferredTranslation);
+          updateTranslation(snap.data().preferredTranslation);
         }
       })
       .catch(console.error);
-    // getDoc(doc(db, "translations", ))
   }, []);
 
   useEffect(() => {
     setPreviewText('Loading preview...');
+    if (!translation) return;
     fetch(`https://rest.api.bible/v1/bibles/${translation}/verses/ROM.5.8?content-type=text`, {
       headers: {
         'api-key': import.meta.env.VITE_BIBLE_API_KEY
       }
     })
-      .then(res => res.json())
-      .then(data => setPreviewText(data.data.content))
-      .catch(() => setPreviewText('Could not load preview.'));
-  }, [userSelection]);
+    .then(res => res.json())
+    .then(data => setPreviewText(data.data.content))
+    .catch(() => setPreviewText('Could not load preview.'));
+  }, [translation]);
+
+  async function updateTranslation(val) {
+    const q = await query(collection(db, "translations"), where("abbreviationLocal", "==", val));
+    const qSnapshot = await getDocs(q);
+    if (!qSnapshot.empty) {
+      const translationId = qSnapshot.docs[0].data().id;
+      setTranslation(translationId);
+      console.log(translation);
+    };
+  }
 
   const handleChange = async (e) => {
-    const val = e.target.value;
-    setUserSelection(val);
-    const user = auth.currentUser;
-    if (!user) return;
-    setSaving(true);
-    try {
-      await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
-    } catch (err) {
-      console.error("Error saving translation:", err);
-    } finally {
-      setSaving(false);
-    }
+      const user = auth.currentUser;
+
+      const val = e.target.value;
+      setUserSelection(val);
+
+      if (!user) return;
+      setSaving(true);
+      try {
+        await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
+      } catch (err) {
+        console.error("Error saving translation:", err);
+      } finally {
+        setSaving(false);
+      }
+
+      updateTranslation(val);
   };
 
   return (
