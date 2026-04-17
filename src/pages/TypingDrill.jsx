@@ -104,7 +104,7 @@ async function fetchPassage(parsed, translation) {
 
   const bibleId = await getTranslationId(translation);
   const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
-  const modifiers = `?content-type=html&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`
+  const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`
   const id = parsedRefToID(parsed);
 
   if (parsed.type === 'verse') {
