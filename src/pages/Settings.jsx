@@ -26,7 +26,7 @@ function Settings() {
     setPreviewText('Loading preview...');
     if(userSelection == '') return;
     getTranslationId(userSelection)
-    .then(id => fetch(`https://rest.api.bible/v1/bibles/${id}/verses/ROM.5.8?content-type=text`, {
+    .then(id => fetch(`https://rest.api.bible/v1/bibles/${id}/verses/ROM.5.8?content-type=text&include-verse-numbers=false`, {
       headers: {
         'api-key': import.meta.env.VITE_BIBLE_API_KEY
       }
