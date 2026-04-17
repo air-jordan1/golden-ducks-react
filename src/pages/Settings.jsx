@@ -12,7 +12,7 @@ const TRANSLATIONS = {
 function Settings() {
   const [userSelection, setUserSelection] = useState('kjv');
   const [translation, setTranslation] = useState('de4e12af7f28f599-02');
-  const [previewText, setPreviewText] = useState('Loading preview...');
+  const [previewText, setPreviewText] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function Settings() {
 
   useEffect(() => {
     setPreviewText('Loading preview...');
-    fetch(`https://rest.api.bible/v1/bibles/${translation}/verses/ROM.5.8`, {
+    fetch(`https://rest.api.bible/v1/bibles/${translation}/verses/ROM.5.8?content-type=text`, {
       headers: {
         'api-key': import.meta.env.VITE_BIBLE_API_KEY
       }
@@ -38,7 +38,6 @@ function Settings() {
       .then(res => res.json())
       .then(data => setPreviewText(data.data.content))
       .catch(() => setPreviewText('Could not load preview.'));
-      console.log("hello");
   }, [userSelection]);
 
   const handleChange = async (e) => {
