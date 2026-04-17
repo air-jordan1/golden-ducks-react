@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import '../App.css';
-import BackButton from "./components/BackButton";
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore";
 
@@ -112,10 +110,8 @@ function TypingDrill() {
 
   return (
     <div className="page-container">
-      <NavMenu />
       <div className="modern-card welcome-card" style={{ marginTop: '20px' }}>
         <HeaderArea />
-        <BackButton />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           {state === STATES.INTRO && (
             <TypingDrillIntro onStart={handleStart} translation={translation} />
@@ -218,17 +214,6 @@ function TypingDrillIntro({ onStart, translation }) {
         </>
       )}
     </div>
-  );
-}
-
-function NavMenu() {
-  return (
-    <nav className="button-group" style={{ marginBottom: '20px' }}>
-      <Link to="/" className="btn-modern">Home</Link>
-      <Link to="/typing-drill" className="btn-modern">Typing Drill</Link>
-      <Link to="/account" className="btn-modern">Account</Link>
-      <Link to="/settings" className="btn-modern">Settings</Link>
-    </nav>
   );
 }
 

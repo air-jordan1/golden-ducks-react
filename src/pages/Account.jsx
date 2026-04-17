@@ -4,8 +4,6 @@ import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import "../App.css";
-import BackButton from "./components/BackButton";
-
 function Account() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -65,8 +63,6 @@ function Account() {
   return (
     <div className="page-container">
       <div className="modern-card account-card">
-        <BackButton />
-
         <h1 className="title">Account</h1>
 
         <div className="account-columns">
