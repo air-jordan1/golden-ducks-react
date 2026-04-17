@@ -14,10 +14,10 @@ const STATES = {
 const maxLevel = 4;
 
 const levelDescriptions = [
-    { level: 1, label: 'Level 1', desc: 'Full verse shown — type it out' },
-    { level: 2, label: 'Level 2', desc: '50% of words hidden — fill in the blanks' },
-    { level: 3, label: 'Level 3', desc: '66% of words hidden — fill in the blanks' },
-    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
+    { level: 1, label: 'Level 1', desc: 'Full verse shown, type it out' },
+    { level: 2, label: 'Level 2', desc: 'Half of words hidden, fill in the blanks' },
+    { level: 3, label: 'Level 3', desc: 'Most of words hidden, fill in the blanks' },
+    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown, type from memory' },
   ];
 
 function levelIdToName(level) {
@@ -27,19 +27,18 @@ function levelIdToName(level) {
   if (level === maxLevel) return (word) => '_'.repeat(word.length);
 }
 
-// Level 1 difficulty: Show the full verse
-function levelOne(word) {
+function levelOne(word) { // Level 1 difficulty: Here for easy polymorphism
+  
   return word;
 }
 
-// Level 2 difficulty: Blank half the words
-function levelTwo(word, index) {
+function levelTwo(word, index) {// Level 2 difficulty: Blank half the words
+  
   if (index % 2 === 0) return word;
   else return '_'.repeat(word.length);
 }
 
-// Level 3 difficulty: Blank two-thirds the words
-function levelThree(word, index) {
+function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the words
   if (index % 3 === 0) return word;
   else return '_'.repeat(word.length);
 }
@@ -128,6 +127,13 @@ async function fetchPassage(parsed, translation) {
   throw new Error();
 }
 
+// Clean verse numbers like [1], [2], etc.
+function cleanVerseNumbers(text) {
+  return text
+  .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
+  .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
+}
+
 // Normalize text to a common format for comparison (lowercase, remove punctuation, trim)
 function normalize(text) {
   return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -152,9 +158,8 @@ function getProgressKey(reference) {
 }
 
 // Blank words for increasing difficulty
-function blankWords(text, difficulty) {
+function blankOutWords(text, difficulty) {
   const words = text.trim().split(' ');
-  console.log(text + " : " + words.map((word, index) => difficulty(word, index)).join(' '));
   return words.map((word, index) => difficulty(word, index)).join(' ');
 }
 
@@ -186,7 +191,7 @@ function TypingDrill() {
       .catch(console.error);
   }, []);
 
-  // Sets up a timer that starts and stops based on the isRunning state
+  // Set up a timer that starts and stops based on the isRunning state
   useEffect(() => {
     if (isRunning) {
       timerRef.current = setInterval(() => setTime(t => t + 1), 1000);
@@ -217,8 +222,8 @@ function TypingDrill() {
 
   async function handleSubmit() {
     setIsRunning(false);
-    const val = inputRef.current.value;
-    const acc = calcAccuracy(val, currentPassage);
+    const val = cleanVerseNumbers(inputRef.current.value);
+    const acc = calcAccuracy(val, cleanVerseNumbers(currentPassage));
     setUserInput(val);
     setAccuracy(acc);
     const completed = acc >= COMPLETION_THRESHOLD;
@@ -333,7 +338,7 @@ function TypingDrill() {
 
 // Prompt and setup screen
 function TypingDrillIntro({ onStart, translation }) {
-  const [reference, setReference] = useState('John 3:16');
+  const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -344,7 +349,7 @@ function TypingDrillIntro({ onStart, translation }) {
   const handleLookup = async () => {
     const parsed = parseReference(reference);
     if (!parsed) {
-      setError('Enter a reference like "John 3:16", "John 1:1-7", or "Proverbs 2"');
+      setError('Something is wrong with the reference. Format like this: "John 3:16", "John 1:1-7", or "Proverbs 2"');
       return;
     }
     setError('');
@@ -487,7 +492,7 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
       {/* Verse reference */}
       <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
         <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }}>
-          {blankWords(currentPassage, levelIdToName(level))}
+          {blankOutWords(cleanVerseNumbers(currentPassage), levelIdToName(level))}
         </p>
       </div>
       {/* Input field */}
