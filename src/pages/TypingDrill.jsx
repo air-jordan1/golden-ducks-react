@@ -14,10 +14,10 @@ const STATES = {
 const maxLevel = 4;
 
 const levelDescriptions = [
-    { level: 1, label: 'Level 1', desc: 'Full verse shown, type it out' },
-    { level: 2, label: 'Level 2', desc: 'Half of words hidden, fill in the blanks' },
-    { level: 3, label: 'Level 3', desc: 'Most of words hidden, fill in the blanks' },
-    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown, type from memory' },
+    { level: 1, label: 'Level 1', desc: 'Full verse shown — type it out' },
+    { level: 2, label: 'Level 2', desc: '30% of words hidden — fill in the blanks' },
+    { level: 3, label: 'Level 3', desc: '66% of words hidden — fill in the blanks' },
+    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
   ];
 
 function levelIdToName(level) {
@@ -32,9 +32,9 @@ function levelOne(word) { // Level 1 difficulty: Here for easy polymorphism
   return word;
 }
 
-function levelTwo(word, index) {// Level 2 difficulty: Blank half the words
-  
-  if (index % 2 === 0) return word;
+// Level 2 difficulty: Blank 30% of words (3 out of every 10)
+function levelTwo(word, index) {
+  if (index % 10 < 7) return word;
   else return '_'.repeat(word.length);
 }
 
