@@ -5,7 +5,7 @@ import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "fireb
 async function getPreferredTranslation() {
     const user = auth.currentUser;
     if (!user) return;
-    getDoc(doc(db, "users", user.uid))
+    return getDoc(doc(db, "users", user.uid))
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
             return snap.data().preferredTranslation;
