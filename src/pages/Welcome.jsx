@@ -24,8 +24,6 @@ function Welcome() {
       <nav className="dashboard-nav">
         <div className="dashboard-nav-left">
           <span className="nav-logo">Scripturize</span>
-          <Link to="/typing-drill" className="nav-link" style={{ textDecoration: 'none' }}>Study tools</Link>
-          <Link to="/settings" className="nav-link" style={{ textDecoration: 'none' }}>Translations</Link>
         </div>
         <div className="dashboard-nav-right">
           <span className="nav-user-email">{email}</span>

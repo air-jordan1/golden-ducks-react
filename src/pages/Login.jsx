@@ -60,17 +60,6 @@ const Login = () => {
       <nav className="landing-nav">
         <div className="nav-left">
           <span className="nav-logo">Scripturize</span>
-          <span className="nav-link">Study tools</span>
-          <span className="nav-link">Translations</span>
-        </div>
-        <div className="nav-center">
-          <div className="nav-search">
-            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ flexShrink: 0, color: '#9ca3af' }}>
-              <circle cx="11" cy="11" r="8" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35" />
-            </svg>
-            <span>Search for verses...</span>
-          </div>
         </div>
         <div className="nav-right">
           <button className="nav-btn-outline" onClick={handleGoogleSignIn}>Log in</button>
