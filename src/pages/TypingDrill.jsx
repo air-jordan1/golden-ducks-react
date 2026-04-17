@@ -479,7 +479,7 @@ function TypingDrillIntro({ onStart, translation }) {
 
 // Drilling screen
 function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level }) {
-
+  userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
@@ -490,8 +490,8 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
         <span className="label-text">Time: {time}s</span>
       </div>
       {/* Verse reference */}
-      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
-        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }}>
+      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
           {blankOutWords(cleanVerseNumbers(currentPassage), levelIdToName(level))}
         </p>
       </div>
@@ -620,6 +620,9 @@ function InputField({ inputRef, handleKeyDown, handleSubmit }) {
       onKeyDown={handleInputKey}
       autoComplete="off"
       spellCheck="false"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
     />
   );
 }
