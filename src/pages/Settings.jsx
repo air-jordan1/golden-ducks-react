@@ -10,7 +10,8 @@ const TRANSLATIONS = {
 };
 
 function Settings() {
-  const [translation, setTranslation] = useState('kjv');
+  const [userSelection, setUserSelection] = useState('kjv');
+  const [translation, setTranslation] = useState('de4e12af7f28f599-02');
   const [previewText, setPreviewText] = useState('Loading preview...');
   const [saving, setSaving] = useState(false);
 
@@ -20,23 +21,29 @@ function Settings() {
     getDoc(doc(db, "users", user.uid))
       .then(snap => {
         if (snap.exists() && snap.data().preferredTranslation) {
-          setTranslation(snap.data().preferredTranslation);
+          setUserSelection(snap.data().preferredTranslation);
         }
       })
       .catch(console.error);
+    // getDoc(doc(db, "translations", ))
   }, []);
 
   useEffect(() => {
     setPreviewText('Loading preview...');
-    fetch(`https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/romans/chapters/5/verses/8.json`)
+    fetch(`https://rest.api.bible/v1/bibles/${translation}/verses/ROM.5.8`, {
+      headers: {
+        'api-key': import.meta.env.VITE_BIBLE_API_KEY
+      }
+    })
       .then(res => res.json())
-      .then(data => setPreviewText(data.text))
+      .then(data => setPreviewText(data.data.content))
       .catch(() => setPreviewText('Could not load preview.'));
-  }, [translation]);
+      console.log("hello");
+  }, [userSelection]);
 
   const handleChange = async (e) => {
     const val = e.target.value;
-    setTranslation(val);
+    setUserSelection(val);
     const user = auth.currentUser;
     if (!user) return;
     setSaving(true);
@@ -58,7 +65,7 @@ function Settings() {
         <p className="subtitle">Translation {saving && '— Saving...'}</p>
 
         <select
-          value={translation}
+          value={userSelection}
           onChange={handleChange}
           style={{
             width: '100%',
