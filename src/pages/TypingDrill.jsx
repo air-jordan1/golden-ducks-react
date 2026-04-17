@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
-import { getPreferredTranslation, getTranslationId } from '../User';
+import { map } from '../BookIDMap';
+import { getTranslationId } from '../User';
 
 const STATES = {
   INTRO: 'intro',
@@ -12,6 +13,7 @@ const STATES = {
 
 const COMPLETION_THRESHOLD = 90;
 
+// Parse the Scripture reference
 function parseReference(ref) {
   const t = ref.trim();
   const bookSlug = (b) => b.toLowerCase().replace(/\s+/g, '-');
@@ -46,42 +48,59 @@ function parseReference(ref) {
   return null;
 }
 
+function parsedRefToID(parsed) {
+  let id = '';
+  const book = map.get(parsed.book);
+  const chapter = parsed.chapter;
+
+  if (parsed.type === 'range') {
+    id = `${book}.${chapter}.${parsed.start}-${book}.${chapter}.${parsed.end}`;
+  }
+  if (parsed.type === 'verse') {
+    id = `${book}.${chapter}.${parsed.verse}`;
+  }
+  if (parsed.type === 'chapter') {
+    id = `${book}.${chapter}`;
+  }
+
+  return id;
+}
+
+// Fetch the passage from the parsed reference
 async function fetchPassage(parsed, translation) {
-  const base = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/${parsed.book}/chapters/${parsed.chapter}`;
+  // const base = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/${parsed.book}/chapters/${parsed.chapter}`;
+
+  const bibleId = await getTranslationId(translation);
+  const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
+  const id = parsedRefToID(parsed);
 
   if (parsed.type === 'verse') {
-    const res = await fetch(`${base}/verses/${parsed.verse}.json`);
+    const res = await fetch(`${base}/verses/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
-    return (await res.json()).text;
+    return (await res.json()).data.content;
   }
 
   if (parsed.type === 'range') {
-    const nums = Array.from({ length: parsed.end - parsed.start + 1 }, (_, i) => parsed.start + i);
-    const results = await Promise.all(nums.map(v => fetch(`${base}/verses/${v}.json`)));
-    const texts = await Promise.all(results.map(r => r.ok ? r.json().then(d => d.text) : null));
-    const filtered = texts.filter(Boolean);
-    if (!filtered.length) throw new Error();
-    return filtered.join(' ');
+    const res = await fetch(`${base}/passages/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+    if (!res.ok) throw new Error();
+    return (await res.json()).data.content;
   }
 
   if (parsed.type === 'chapter') {
-    const texts = [];
-    for (let v = 1; v <= 200; v++) {
-      const res = await fetch(`${base}/verses/${v}.json`);
-      if (!res.ok) break;
-      texts.push((await res.json()).text);
-    }
-    if (!texts.length) throw new Error();
-    return texts.join(' ');
+    const res = await fetch(`${base}/chapters/${id}?content-type=text`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+    if (!res.ok) throw new Error();
+    return (await res.json()).data.content;
   }
 
   throw new Error();
 }
 
+// Normalize (?)
 function normalize(text) {
   return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
 }
 
+// Calculate Accuracy
 function calcAccuracy(typed, target) {
   const targetWords = normalize(target).split(/\s+/).filter(Boolean);
   const typedWords = normalize(typed).split(/\s+/).filter(Boolean);
@@ -93,35 +112,46 @@ function calcAccuracy(typed, target) {
   return Math.round((correct / targetWords.length) * 100);
 }
 
+// IDK 
 function progressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
 }
 
+// Blank half the words
 function blankHalfWords(text) {
   const words = text.split(' ');
   return words.map((word, i) => (i % 2 === 1 ? '_ '.repeat(Math.max(1, Math.floor(word.length / 2))).trim() : word)).join(' ');
 }
 
+// Typing Drill
 function TypingDrill() {
-  const [state, setState] = useState(STATES.INTRO);
-  const [userInput, setUserInput] = useState('');
-  const [currentPassage, setCurrentPassage] = useState('');
-  const [currentReference, setCurrentReference] = useState('');
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [translation, setTranslation] = useState('kjv');
-  const [accuracy, setAccuracy] = useState(0);
-  const [levelCompleted, setLevelCompleted] = useState(false);
+  const [state, setState] = useState(STATES.INTRO); // running states
+  const [userInput, setUserInput] = useState(''); // user input
+  const [currentPassage, setCurrentPassage] = useState(''); // current passage
+  const [currentReference, setCurrentReference] = useState(''); // current reference
+  const [currentLevel, setCurrentLevel] = useState(1); // current level
+  const [translation, setTranslation] = useState('KJV'); // current translation
+  const [accuracy, setAccuracy] = useState(0); // accuracy
+  const [levelCompleted, setLevelCompleted] = useState(false); // level completed
   const inputRef = useRef(null);
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
 
+  // set the translation
   useEffect(() => {
-    getPreferredTranslation()
-    .then(abbrev => setTranslation(abbrev));
-    console.log(translation);
+    const user = auth.currentUser;
+    if (!user) return;
+    getDoc(doc(db, "users", user.uid))
+      .then(snap => {
+        if (snap.exists() && snap.data().preferredTranslation) {
+          setTranslation(snap.data().preferredTranslation);
+        }
+      })
+      .catch(console.error);
   }, []);
 
+  // time?
   useEffect(() => {
     if (isRunning) {
       timerRef.current = setInterval(() => setTime(t => t + 1), 1000);
@@ -131,6 +161,7 @@ function TypingDrill() {
     return () => clearInterval(timerRef.current);
   }, [isRunning]);
 
+  // idk
   useEffect(() => {
     if (state === STATES.RUNNING) inputRef.current?.focus();
   }, [state]);
@@ -256,8 +287,8 @@ function TypingDrill() {
   );
 }
 
+// Typing Drill Prompt
 function TypingDrillIntro({ onStart, translation }) {
-  const [translationId, setTranslationId] = useState('');
   const [reference, setReference] = useState('John 3:16');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);

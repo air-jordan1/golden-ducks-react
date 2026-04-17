@@ -5,8 +5,11 @@ import { getPreferredTranslation, setPreferredTranslation, getTranslationId } fr
 import "../App.css";
 
 const TRANSLATIONS = {
-  KJV: 'KJV — King James Version',
   ASV: 'ASV — American Standard Version',
+  CSB: 'CSB - Christian Standard Bible',
+  KJV: 'KJV — King James Version',
+  NIV: 'NIV - New International Version',
+  NLT: 'NLT - New Living Translation'
 };
 
 function Settings() {
