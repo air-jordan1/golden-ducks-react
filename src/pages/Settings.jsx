@@ -10,13 +10,18 @@ const TRANSLATIONS = {
 };
 
 function Settings() {
-  const initialTranslation = getPreferredTranslation().then();
-  const [userSelection, setUserSelection] = useState(initialTranslation);
+  const [userSelection, setUserSelection] = useState('');
   const [previewText, setPreviewText] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    getPreferredTranslation()
+    .then(abbrev => setUserSelection(abbrev));
+  }, []);
+
+  useEffect(() => {
     setPreviewText('Loading preview...');
+    if(userSelection == '') return;
     getTranslationId(userSelection)
     .then(id => fetch(`https://rest.api.bible/v1/bibles/${id}/verses/ROM.5.8?content-type=text`, {
       headers: {
@@ -37,7 +42,7 @@ function Settings() {
       if (!user) return;
       setSaving(true);
       try {
-        await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
+        setPreferredTranslation(val);
       } catch (err) {
         console.error("Error saving translation:", err);
       } finally {

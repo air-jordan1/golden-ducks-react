@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore";
+import { getPreferredTranslation, getTranslationId } from '../User';
 
 const STATES = {
   INTRO: 'intro',
@@ -30,7 +31,7 @@ function TypingDrill() {
   const [userInput, setUserInput] = useState('');
   const [currentPassage, setCurrentPassage] = useState('');
   const [currentReference, setCurrentReference] = useState('');
-  const [translation, setTranslation] = useState('kjv');
+  const [translation, setTranslation] = useState('');
   const [accuracy, setAccuracy] = useState(0);
   const inputRef = useRef(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -38,15 +39,9 @@ function TypingDrill() {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
-    getDoc(doc(db, "users", user.uid))
-      .then(snap => {
-        if (snap.exists() && snap.data().preferredTranslation) {
-          setTranslation(snap.data().preferredTranslation);
-        }
-      })
-      .catch(console.error);
+    getPreferredTranslation()
+    .then(abbrev => setTranslation(abbrev));
+    console.log(translation);
   }, []);
 
   useEffect(() => {
@@ -140,10 +135,17 @@ function TypingDrill() {
 }
 
 function TypingDrillIntro({ onStart, translation }) {
+  const [translationId, setTranslationId] = useState('');
   const [reference, setReference] = useState('John 3:16');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!translation) return;
+    getTranslationId(translation)
+    .then(id => setTranslationId(id));
+  }, [translation]);
 
   const handleLookup = async () => {
     const parsed = parseReference(reference);
@@ -156,7 +158,7 @@ function TypingDrillIntro({ onStart, translation }) {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/${parsed.book}/chapters/${parsed.chapter}/verses/${parsed.verse}.json`
+        `https://rest.api.bible/v1/bibles/${translationId}/verses/JHN.3.16?content-type=text`
       );
       if (!res.ok) throw new Error();
       const data = await res.json();

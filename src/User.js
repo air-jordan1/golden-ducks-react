@@ -15,11 +15,12 @@ async function getPreferredTranslation() {
 }
 
 async function setPreferredTranslation(val) {
-      try {
-        await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
-      } catch (err) {
-        console.error("Error saving translation:", err);
-      }
+  const user = auth.currentUser;
+  try {
+      await updateDoc(doc(db, "users", user.uid), { preferredTranslation: val });
+  } catch (err) {
+      console.error("Error saving translation:", err);
+  }
 }
 
 async function getTranslationId(abbrev) {
