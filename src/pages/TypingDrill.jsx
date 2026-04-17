@@ -229,15 +229,19 @@ function HeaderArea() {
 function TypingDrillRunning(props) {
   return (
     <div style={{ width: '100%' }}>
+      {/* Timer display */}
       <p className="label-text" style={{ marginBottom: '8px', textAlign: 'center' }}>Time: {props.time}s</p>
 
+      {/* Passage to type */}{/*
       <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
         <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }}>
           {props.currentPassage}
         </p>
-      </div>
+      </div>*/}
 
+      {/* Input field */}
       <InputField
+        currentPassage={props.currentPassage}
         inputRef={props.inputRef}
         handleKeyDown={props.handleKeyDown}
         handleSubmit={props.handleSubmit}
@@ -287,30 +291,106 @@ function InputField(props) {
   }, [props]);
 
   return (
-    <textarea
-      ref={props.inputRef}
-      name="drillInput"
-      rows={4}
-      placeholder="Start typing here..."
-      style={{
-        width: '100%',
-        padding: '12px',
-        borderRadius: '12px',
-        border: '1px solid #e5e7eb',
-        backgroundColor: '#f9fafb',
-        fontSize: '16px',
-        color: '#111827',
-        fontFamily: 'inherit',
-        outline: 'none',
-        resize: 'none',
-        boxSizing: 'border-box',
-        lineHeight: '1.6',
-      }}
-      onKeyDown={handleInputKey}
-      autoComplete="off"
-      spellCheck="false"
-    />
+    <div style={drill_input_container}>
+      < div style={drill_background_layer}>
+        
+          {filterForDrill(props.currentPassage, everyOtherWordGone)}
+       
+      </div>
+      <textarea
+        ref={props.inputRef}
+        name="drillInput"
+        rows={4}
+        style={drill_overlay_input}
+        onKeyDown={handleInputKey}
+        autoComplete="off"
+        spellCheck="false"
+      />
+    </div>
   );
+}
+
+const drill_input_container = {
+  width: '100%',
+  height: '100%',
+  padding: '12px',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+  backgroundColor: '#f9fafb',
+  fontSize: '16px',
+  color: '#111827',
+  fontFamily: 'inherit',
+  outline: 'none',
+  resize: 'none',
+  boxSizing: 'border-box',
+  lineHeight: '1.6',
+  position: 'relative',
+  display: 'inline-block',
+  fontFamily: 'Courier New',
+}
+
+const drill_background_layer = {
+  top: 0,
+  left: 0,
+  display: "block",
+  textAlign: 'left',
+  fontFamily: 'Courier New',
+  color: '#393e48',
+  boxSizing: "border-box",
+}
+
+const drill_overlay_input = {
+  position: "absolute",
+  top: "-1px",
+  left: "-1px",
+  width: "100%",
+  height: "100%",
+  margin: 0,
+  border: "1px solid #ccc",
+  fontsize: "16px",
+  boxSizing: "border-box",
+  lineHeight: '1.6',
+  background: "transparent",
+  padding: '12px',
+  borderRadius: '12px',
+  fontSize: '16px',
+  color: '#111827',
+  fontFamily: 'Courier New',
+  outline: 'none',
+  resize: 'none',
+  textAlign: 'left',
+}
+
+// Will take a string and return an array of every n words, used for more advanced drill types in the future
+// Example: getEveryNWords("In the beginning, God created the heaven and the earth.", 3) should return:
+// ["In the beginning,", "God created the", "heaven and the", "earth."]
+function getEveryNWords(string, n) {
+  const returnArray = [];
+  for ( let i = 0; i <= string.length; i += n) {
+    returnArray.push(string.slice(i, i + n));
+  }
+
+  return returnArray;
+}
+
+// Takes an string and a function that filters the string
+function filterForDrill(string, filterFunction) {
+  let stringArray = string.split(/\s+/);
+  let returnString = "";
+  for (let index = 0; index < stringArray.length; index++) {
+    if (filterFunction(index) === true) {
+      returnString += stringArray[index] + " ";
+    } else {
+      returnString += "_".repeat(stringArray[index].length) + " ";
+    }
+  }
+
+  return returnString;
+}
+
+function everyOtherWordGone(index) {
+  console.log(index + " " + index / 2)
+  return index % 2 == 0;
 }
 
 export default TypingDrill;
