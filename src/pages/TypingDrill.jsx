@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
+import { getPreferredTranslation, getTranslationId } from '../User';
 
 const STATES = {
   INTRO: 'intro',
@@ -116,15 +117,9 @@ function TypingDrill() {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
-    getDoc(doc(db, "users", user.uid))
-      .then(snap => {
-        if (snap.exists() && snap.data().preferredTranslation) {
-          setTranslation(snap.data().preferredTranslation);
-        }
-      })
-      .catch(console.error);
+    getPreferredTranslation()
+    .then(abbrev => setTranslation(abbrev));
+    console.log(translation);
   }, []);
 
   useEffect(() => {
@@ -262,6 +257,7 @@ function TypingDrill() {
 }
 
 function TypingDrillIntro({ onStart, translation }) {
+  const [translationId, setTranslationId] = useState('');
   const [reference, setReference] = useState('John 3:16');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
