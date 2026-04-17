@@ -29,9 +29,17 @@ function Account() {
           where("userId", "==", user.uid)
         );
         const snap = await getDocs(q);
-        const results = snap.docs
+        const allResults = snap.docs
           .map(d => ({ id: d.id, ...d.data() }))
+          .filter(r => r.accuracy >= 90)
           .sort((a, b) => b.completedAt?.toDate() - a.completedAt?.toDate());
+
+        const seen = new Set();
+        const results = allResults.filter(r => {
+          if (!r.reference || seen.has(r.reference)) return false;
+          seen.add(r.reference);
+          return true;
+        });
         setDrillResults(results);
       } catch (err) {
         console.error("Error loading account data:", err);
@@ -105,30 +113,29 @@ function Account() {
             </h2>
 
             {drillResults.length === 0 ? (
-              <p className="label-text">No drills completed yet.</p>
+              <p className="label-text">No completed drills yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {drillResults.map(result => (
-                  <div key={result.id} style={{ backgroundColor: '#f9fafb', padding: '16px', borderRadius: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <p style={{ margin: 0, fontSize: '14px', color: '#6b7280' }}>
+                  <div key={result.id} style={{ backgroundColor: '#f9fafb', padding: '14px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#111827', fontSize: '15px' }}>
+                        {result.reference || '—'}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '13px', color: '#6b7280' }}>
                         {result.completedAt?.toDate().toLocaleDateString()}
                       </p>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <span style={{ fontSize: '14px', color: '#10b981', fontWeight: '600' }}>{result.timeTaken}s</span>
-                        {result.accuracy != null && (
-                          <span style={{ fontSize: '14px', fontWeight: '600', color: result.accuracy >= 90 ? '#10b981' : result.accuracy >= 70 ? '#f59e0b' : '#ef4444' }}>
-                            {result.accuracy}%
-                          </span>
-                        )}
-                      </div>
                     </div>
-                    <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#111827' }}>
-                      <strong>Target:</strong> "{result.passage}"
-                    </p>
-                    <p style={{ margin: '0', fontSize: '14px', color: '#111827' }}>
-                      <strong>Typed:</strong> "{result.userInput}"
-                    </p>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      backgroundColor: '#111827',
+                      color: '#ffffff',
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                    }}>
+                      Level {result.level ?? 1}
+                    </span>
                   </div>
                 ))}
               </div>
