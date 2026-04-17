@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { auth, db } from "../firebase";
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import "../App.css";
-import BackButton from "./components/BackButton";
-
 const TRANSLATIONS = {
   KJV: 'KJV — King James Version',
   ASV: 'ASV — American Standard Version',
@@ -73,8 +71,6 @@ function Settings() {
   return (
     <div className="page-container">
       <div className="modern-card settings-card">
-        <BackButton />
-
         <h1 className="title">Settings</h1>
         <p className="subtitle">Translation {saving && '— Saving...'}</p>
 

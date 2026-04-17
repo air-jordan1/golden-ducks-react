@@ -1,52 +1,9 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { Link } from 'react-router-dom';
 import "../App.css";
 
 function Welcome() {
-  const { email } = useParams();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
-
-  const avatarLetter = email ? email[0].toUpperCase() : '?';
-
   return (
     <div className="dashboard-page">
-      {/* Navbar */}
-      <nav className="dashboard-nav">
-        <div className="dashboard-nav-left">
-          <span className="nav-logo">Scripturize</span>
-        </div>
-        <div className="dashboard-nav-right">
-          <span className="nav-user-email">{email}</span>
-          <div className="nav-avatar">{avatarLetter}</div>
-          <button
-            onClick={handleSignOut}
-            style={{
-              background: 'none',
-              border: '1px solid #e8eaf0',
-              borderRadius: '8px',
-              padding: '6px 14px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#5a6377',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-      </nav>
-
       {/* Hero */}
       <section className="dashboard-hero">
         <h1 className="dashboard-greeting">What do you want to memorize?</h1>
