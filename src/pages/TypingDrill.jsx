@@ -547,7 +547,7 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
         <p className="label-text">You typed:</p>
         <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{userInput}"</p>
         <p className="label-text">Target:</p>
-        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{currentPassage}"</p>
+        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{cleanVerseNumbers(currentPassage)}"</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
