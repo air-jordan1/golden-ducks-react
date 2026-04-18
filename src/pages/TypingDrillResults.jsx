@@ -5,8 +5,6 @@ import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, g
 import { map } from '../BookIDMap';
 import { parseReference, parsedRefToID, fetchPassage, getTranslationId } from '../Passage';
 import TypingDrillIntro from './TypingDrillIntro';
-import TypingDrillRunning from './TypingDrillRunning';
-import TypingDrillResults from './TypingDrillResults';
 
 const STATES = {
   INTRO: 'intro',
@@ -15,6 +13,35 @@ const STATES = {
 };
 
 const maxLevel = 4;
+
+const levelDescriptions = [
+    { level: 1, label: 'Level 1', desc: 'Full verse shown — type it out' },
+    { level: 2, label: 'Level 2', desc: '30% of words hidden — fill in the blanks' },
+    { level: 3, label: 'Level 3', desc: '66% of words hidden — fill in the blanks' },
+    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
+  ];
+
+function levelIdToName(level) {
+  if (level === 1) return levelOne;
+  if (level === 2) return levelTwo;
+  if (level === 3) return levelThree;
+  if (level === maxLevel) return (word) => '_'.repeat(word.length);
+}
+
+function levelOne(word) { // Level 1 difficulty: Here for easy polymorphism
+  return word;
+}
+
+// Level 2 difficulty: Blank 30% of words (3 out of every 10)
+function levelTwo(word, index) {
+  if (index % 10 < 7) return word;
+  else return '_'.repeat(word.length);
+}
+
+function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the words
+  if (index % 3 === 0) return word;
+  else return '_'.repeat(word.length);
+}
 
 const COMPLETION_THRESHOLD = 90;
 
@@ -238,6 +265,111 @@ function TypingDrill() {
   );
 }
 
+// Drilling screen
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack }) {
+  userSelect: 'none';
+  return (
+    <div style={{ width: '100%' }}>
+      {/* Running time info */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
+          Level {level} — {levelDescriptions[level - 1].desc}
+        </span>
+        <span className="label-text">Time: {time}s</span>
+      </div>
+      {/* Verse reference */}
+      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
+          {blankOutWords(cleanVerseNumbers(currentPassage), levelIdToName(level))}
+        </p>
+      </div>
+      {/* Input field */}
+      <InputField
+        inputRef={inputRef}
+        handleKeyDown={handleKeyDown}
+        handleSubmit={handleSubmit}
+      />
+
+      <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>
+        Submit Result
+      </button>
+      <button className="btn-modern" onClick={onBack} style={{ marginTop: '10px', width: '100%' }}>
+        Back
+      </button>
+    </div>
+  );
+}
+
+// Results screen
+function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, levelCompleted, onRestart, onNextLevel, onRetry }) {
+  const accuracyColor = accuracy >= 90 ? '#10b981' : accuracy >= 70 ? '#f59e0b' : '#ef4444';
+
+  return (
+    <div style={{ textAlign: 'center', width: '100%' }}>
+      <h2 className="title" style={{ fontSize: '24px', marginBottom: '8px' }}>Results</h2>
+      <p className="label-text" style={{ marginBottom: '20px' }}>Level {level}</p>
+
+      {levelCompleted ? (
+        <div style={{ backgroundColor: '#d1fae5', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px' }}>
+          <p style={{ margin: 0, color: '#065f46', fontWeight: '600', fontSize: '15px' }}>
+            Level {level} completed! {level < maxLevel ? `Try Level ${level + 1} next.` : 'You have this verse memorized!'}
+          </p>
+        </div>
+      ) : (
+        <div style={{ backgroundColor: '#fee2e2', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px' }}>
+          <p style={{ margin: 0, color: '#991b1b', fontWeight: '600', fontSize: '15px' }}>
+            Need {COMPLETION_THRESHOLD}% accuracy to complete this level. Keep practicing!
+          </p>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '24px' }}>
+        <div style={{ backgroundColor: '#f9fafb', padding: '16px 24px', borderRadius: '12px', flex: 1 }}>
+          <p className="label-text" style={{ margin: '0 0 4px 0' }}>Time</p>
+          <p style={{ fontSize: '22px', fontWeight: '700', color: '#10b981', margin: 0 }}>{time}s</p>
+        </div>
+        <div style={{ backgroundColor: '#f9fafb', padding: '16px 24px', borderRadius: '12px', flex: 1 }}>
+          <p className="label-text" style={{ margin: '0 0 4px 0' }}>Accuracy</p>
+          <p style={{ fontSize: '22px', fontWeight: '700', color: accuracyColor, margin: 0 }}>{accuracy}%</p>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '12px', textAlign: 'left', marginBottom: '20px' }}>
+        <p className="label-text">You typed:</p>
+        <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{userInput}"</p>
+        <p className="label-text">Target:</p>
+        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{cleanVerseNumbers(currentPassage)}"</p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <button
+          className="btn-modern"
+          style={{ width: '100%' }}
+          onClick={onRetry}
+        >
+          Try again
+        </button>
+        {levelCompleted && level < maxLevel && (
+          <button
+            className="btn-modern"
+            style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
+            onClick={onNextLevel}
+          >
+            Advance to Level {level + 1}
+          </button>
+        )}
+        <button
+          className="btn-modern"
+          style={{ width: '100%' }}
+          onClick={onRestart}
+        >
+          Try a Different Verse
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function HeaderArea() {
   return (
     <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -247,4 +379,43 @@ function HeaderArea() {
   );
 }
 
-export default TypingDrill;
+function InputField({ inputRef, handleKeyDown, handleSubmit }) {
+  const handleInputKey = useCallback((event) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    } else {
+      handleKeyDown(event);
+    }
+  }, [handleKeyDown, handleSubmit]);
+
+  return (
+    <textarea
+      ref={inputRef}
+      name="drillInput"
+      rows={4}
+      placeholder="Start typing here..."
+      style={{
+        width: '100%',
+        padding: '12px',
+        borderRadius: '12px',
+        border: '1px solid #e5e7eb',
+        backgroundColor: '#f9fafb',
+        fontSize: '16px',
+        color: '#111827',
+        fontFamily: 'inherit',
+        outline: 'none',
+        resize: 'none',
+        boxSizing: 'border-box',
+        lineHeight: '1.6',
+      }}
+      onKeyDown={handleInputKey}
+      autoComplete="off"
+      spellCheck="false"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    />
+  );
+}
+
+export default TypingDrillResults;

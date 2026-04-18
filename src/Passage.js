@@ -79,7 +79,6 @@ async function fetchPassage(parsed, translation) {
 
   if (parsed.type === 'verse') {
     const res = await fetch(`${base}/verses/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
-    console.log(res);
     if (!res.ok) throw new Error();
     return (await res.json()).data.content.replace('¶', '');
   }
