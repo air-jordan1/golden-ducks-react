@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, setDoc } from "firebase/firestore";
 import "../App.css";
 function Account() {
   const navigate = useNavigate();
@@ -60,13 +60,20 @@ function Account() {
       console.error("Error signing out:", error);
     }
   };
+
+  // This should update the username when called
   const handleChangeUsername = async () => {
     const newUsername = window.prompt("Enter your new username:");
     if (!newUsername || !newUsername.trim()) return;
     const user = auth.currentUser;
     if (!user) return;// Sanity check; there should always be a user at this point
     try {
-      await updateDoc(doc(db, "users", user.uid), {username: newUsername.trim() });
+      await setDoc(
+        doc(db, "users", user.uid),
+        { username: newUsername.trim() },
+        {merge: true}
+      );
+      //ait updateDoc(doc(db, "users", user.uid), {username: newUsername.trim() });
       setProfile(prev => ({ ...prev, username: newUsername.trim() }));
       setError('');
     } catch (err) {
