@@ -4,7 +4,6 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
 import { map } from '../BookIDMap';
 import { parseReference, parsedRefToID, fetchPassage, getTranslationId } from '../Passage';
-console.log('fetchpassage:'+fetchPassage);
 
 const STATES = {
   INTRO: 'intro',
@@ -277,7 +276,6 @@ function TypingDrillIntro({ onStart, translation }) {
 
   const handleLookup = async () => {
     const parsed = parseReference(reference);
-    console.log(parsed);
     if (!parsed) {
       setError('Something is wrong with the reference. Format like this: "John 3:16", "John 1:1-7", or "Proverbs 2"');
       return;
@@ -286,9 +284,7 @@ function TypingDrillIntro({ onStart, translation }) {
     setFetchedText('');
     setLoading(true);
     try {
-      console.log('trying...');
       const text = await fetchPassage(parsed, translation);
-      console.log(text);
       setFetchedText(text);
       loadProgress(reference.trim());
     } catch {
