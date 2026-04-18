@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from "../firebase";
 import { collection, doc, getDoc, getDocs, getPersistentCacheIndexManager, query, updateDoc, where } from "firebase/firestore";
-import { getPreferredTranslation, setPreferredTranslation, getTranslationId } from '../User.js'
+import { getPreferredTranslation, setPreferredTranslation } from '../User.js'
+import { getTranslationId } from '../Passage.js';
 import "../App.css";
 
 // holds translation options

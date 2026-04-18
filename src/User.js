@@ -23,12 +23,4 @@ async function setPreferredTranslation(val) {
   }
 }
 
-async function getTranslationId(abbrev) {
-    const q = await query(collection(db, "translations"), where("abbreviationLocal", "==", abbrev));
-    const qSnapshot = await getDocs(q);
-    if (!qSnapshot.empty) {
-      return qSnapshot.docs[0].data().id;
-    };
-}
-
-export { getPreferredTranslation, setPreferredTranslation, getTranslationId };
+export { getPreferredTranslation, setPreferredTranslation };
