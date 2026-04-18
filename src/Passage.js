@@ -73,7 +73,6 @@ function parsedRefToID(parsed) {
 async function fetchPassage(parsed, translation) {
 
   const bibleId = await getTranslationId(translation);
-  console.log('hello:'+bibleId);
   const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
   const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`;
   const id = parsedRefToID(parsed);
@@ -116,9 +115,7 @@ function cleanVerseNumbers(text) {
 async function getTranslationId(abbrev) {
     const q = await query(collection(db, "translations"), where("abbreviationLocal", "==", abbrev));
     const qSnapshot = await getDocs(q);
-    console.log('this ran');
     if (!qSnapshot.empty) {
-        console.log(qSnapshot.docs[0].data().id);
         return qSnapshot.docs[0].data().id;
     };
 }
