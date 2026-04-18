@@ -1,16 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
-import { map } from '../BookIDMap';
-import { parseReference, parsedRefToID, fetchPassage, getTranslationId } from '../Passage';
-import TypingDrillIntro from './TypingDrillIntro';
-
-const STATES = {
-  INTRO: 'intro',
-  RUNNING: 'running',
-  RESULTS: 'results'
-};
 
 const maxLevel = 4;
 

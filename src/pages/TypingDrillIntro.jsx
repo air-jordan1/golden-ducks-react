@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
-import { map } from '../BookIDMap';
-import { parseReference, parsedRefToID, fetchPassage, getTranslationId } from '../Passage';
+import { doc, getDoc } from "firebase/firestore";
+import { parseReference, fetchPassage } from '../Passage';
 
 const maxLevel = 4;
 

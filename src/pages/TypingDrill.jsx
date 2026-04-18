@@ -2,8 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, setDoc } from "firebase/firestore";
-import { map } from '../BookIDMap';
-import { parseReference, parsedRefToID, fetchPassage, getTranslationId } from '../Passage';
 import TypingDrillIntro from './TypingDrillIntro';
 import TypingDrillRunning from './TypingDrillRunning';
 import TypingDrillResults from './TypingDrillResults';
@@ -13,8 +11,6 @@ const STATES = {
   RUNNING: 'running',
   RESULTS: 'results'
 };
-
-const maxLevel = 4;
 
 const COMPLETION_THRESHOLD = 90;
 
@@ -47,12 +43,6 @@ function calcAccuracy(typed, target) {
 // easy behind the scenes storage and lookup of progress
 function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
-}
-
-// Blank words for increasing difficulty
-function blankOutWords(text, difficulty) {
-  const words = text.trim().split(' ');
-  return words.map((word, index) => difficulty(word, index)).join(' ');
 }
 
 // Typing Drill main function
