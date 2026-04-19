@@ -65,16 +65,17 @@ function Account() {
   const handleChangeUsername = async () => {
     const newUsername = window.prompt("Enter your new username:");
     if (!newUsername || !newUsername.trim()) return;
+    const trimmedUsername = newUsername.trim().slice(0, 30);// ensures the username is not outrageously long
     const user = auth.currentUser;
     if (!user) return;// Sanity check; there should always be a user at this point
     try {
       await setDoc(
         doc(db, "users", user.uid),
-        { username: newUsername.trim() },
+        { username: trimmedUsername },// completes the db update
         {merge: true}
       );
-      //ait updateDoc(doc(db, "users", user.uid), {username: newUsername.trim() });
-      setProfile(prev => ({ ...prev, username: newUsername.trim() }));
+      
+      setProfile(prev => ({ ...prev, username: trimmedUsername })); //completes the local update
       setError('');
     } catch (err) {
       console.error("Error updating username:", err);
