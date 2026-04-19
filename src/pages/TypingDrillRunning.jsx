@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
+import VoiceInputTest from './AudioTest.jsx';
 
 const maxLevel = 4;
 
@@ -135,6 +136,8 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
       onCut={(e) => e.preventDefault()}
       onPaste={(e) => e.preventDefault()}
     />
+
+    <VoiceInputTest />
   </div>);
 }
 
