@@ -188,7 +188,7 @@ const drill_input_container = {
   lineHeight: '1.6',
   position: 'relative',
   display: 'inline-block',
-  fontFamily: 'Courier New',
+  fontFamily: 'Cascadia Code, monospace',
 }
 
 const drill_background_layer = {
@@ -208,6 +208,7 @@ const drill_background_layer = {
   color: '#374151', 
   borderRadius: '12px',
   border: '1px solid #e5e7eb',
+  fontFamily: 'Cascadia Code, monospace',
 }
 
 const drill_overlay_input = {
@@ -227,6 +228,7 @@ const drill_overlay_input = {
   color: '#111827',
   borderRadius: '12px',
   border: '1px solid #e5e7eb',
+  fontFamily: 'Cascadia Code, monospace',
 
   resize: 'none',
   background: "transparent",
