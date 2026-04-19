@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
+import VoiceInputTest from './AudioTest.jsx';
 
 const maxLevel = 4;
 
@@ -35,14 +36,6 @@ function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the wo
 
 const COMPLETION_THRESHOLD = 90;
 
-// Clean verse numbers like [1], [2], etc.
-function cleanVerseNumbers(text) {
-  return text
-  .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
-  .replace('¶', '')
-  .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
-}
-
 // Normalize text to a common format for comparison (lowercase, remove punctuation, trim)
 function normalize(text) {
   return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -73,7 +66,7 @@ function blankOutWords(text, difficulty) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode }) {
   userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>
@@ -84,18 +77,9 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
         </span>
         <span className="label-text">Time: {time}s</span>
       </div>
-      {/* Verse reference */}
-      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
-        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
-          {blankOutWords(cleanVerseNumbers(currentPassage), levelIdToName(level))}
-        </p>
-      </div>
-      {/* Input field */}
-      <InputField
-        inputRef={inputRef}
-        handleKeyDown={handleKeyDown}
-        handleSubmit={handleSubmit}
-      />
+      {/* Verse Reference + Input field */}
+      {drillMode === 'simple' && simpleInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode)}
+      {drillMode === 'overlay' && overlayInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit,drillMode)}
 
       <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>
         Submit Result
@@ -107,7 +91,8 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
   );
 }
 
-function InputField({ inputRef, handleKeyDown, handleSubmit }) {
+function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode) {
+  
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
       handleSubmit();
@@ -117,11 +102,19 @@ function InputField({ inputRef, handleKeyDown, handleSubmit }) {
   }, [handleKeyDown, handleSubmit]);
 
   return (
+  <div> 
+    {/* Verse reference */}
+    <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+      <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
+        {blankOutWords(currentPassage, level)}
+      </p>
+    </div>
+    {/* Input field */}
     <textarea
       ref={inputRef}
       name="drillInput"
       rows={4}
-      placeholder="Start typing here..."
+      placeholder="Timer starts when you start typing..."
       style={{
         width: '100%',
         padding: '12px',
@@ -143,7 +136,105 @@ function InputField({ inputRef, handleKeyDown, handleSubmit }) {
       onCut={(e) => e.preventDefault()}
       onPaste={(e) => e.preventDefault()}
     />
-  );
+
+    <VoiceInputTest />
+  </div>);
+}
+
+function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit) {
+  const handleInputKey = useCallback((event) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    } else {
+      handleKeyDown(event);
+    }
+  }, [handleKeyDown, handleSubmit]);
+
+  return (
+  <div className="drill-input-container" style={drill_input_container}> 
+    {/* Verse reference */}
+    <div className="drill-background-layer"  onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+      <p style={drill_background_layer} onCopy={(e) => e.preventDefault()}>
+        {blankOutWords(currentPassage, level)}
+      </p>
+    </div>
+    {/* Input field */}
+    <textarea
+      className="drill-overlay-input"
+      style={drill_overlay_input}
+      ref={inputRef}
+      name="drillInput"
+      rows={4}
+      onKeyDown={handleInputKey}
+      autoComplete="off"
+      spellCheck="false"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    />
+  </div>);
+}
+
+const drill_input_container = {
+  width: '100%',
+  height: '400px',
+  padding: '12px',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+  backgroundColor: '#f9fafb',
+  fontSize: '16px',
+  color: '#111827',
+  fontFamily: 'inherit',
+  outline: 'none',
+  resize: 'none',
+  boxSizing: 'border-box',
+  lineHeight: '1.6',
+  position: 'relative',
+  display: 'inline-block',
+  fontFamily: 'Cascadia Code, monospace',
+}
+
+const drill_background_layer = {
+  position: "absolute",
+  height: '100%', 
+  width: "100%",
+  top: 0,
+  left: 0,
+  margin: 0, 
+  fontSize: '16px', 
+  display: "block",
+  textAlign: 'left',
+  fontFamily: 'Courier New',
+  lineHeight: '1.6',
+  boxSizing: "border-box",
+  padding: '12px',
+  color: '#374151', 
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+  fontFamily: 'Cascadia Code, monospace',
+}
+
+const drill_overlay_input = {
+  position: "absolute",
+  height: '100%',
+  width: "100%",
+  top: 0,
+  left: 0,
+  margin: 0,
+  fontSize: "16px",
+  display: "block",
+  textAlign: 'left',
+  fontFamily: 'Courier New',
+  lineHeight: '1.6',
+  boxSizing: "border-box",
+  padding: '12px',
+  color: '#111827',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+  fontFamily: 'Cascadia Code, monospace',
+
+  resize: 'none',
+  background: "transparent",
 }
 
 export default TypingDrillRunning;
