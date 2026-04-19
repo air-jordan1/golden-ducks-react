@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, setDoc } from "firebase/firestore";
 import "../App.css";
 function Account() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [drillResults, setDrillResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -60,6 +61,27 @@ function Account() {
     }
   };
 
+  // This should update the username when called
+  const handleChangeUsername = async () => {
+    const newUsername = window.prompt("Enter your new username:");
+    if (!newUsername || !newUsername.trim()) return;
+    const user = auth.currentUser;
+    if (!user) return;// Sanity check; there should always be a user at this point
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        { username: newUsername.trim() },
+        {merge: true}
+      );
+      //ait updateDoc(doc(db, "users", user.uid), {username: newUsername.trim() });
+      setProfile(prev => ({ ...prev, username: newUsername.trim() }));
+      setError('');
+    } catch (err) {
+      console.error("Error updating username:", err);
+      setError('Failed to update username.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -80,6 +102,13 @@ function Account() {
               <div style={{ marginBottom: '24px' }}>
                 <p className="label-text">Email</p>
                 <p style={{ fontWeight: '600', color: '#111827' }}>{profile.email}</p>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <p style={{ fontWeight: '600', color: '#111827' }}>{profile.username || profile.email}</p>
+                  <button onClick={handleChangeUsername} className="btn-modern" style={{ fontSize: '12px', padding: '4px 8px' }}>Change Username</button>
+                </div>
+                {error && <p style={{ color: 'red', fontSize: '14px', marginTop: '8px' }}>{error}</p>}
+
                 <p className="label-text" style={{ marginTop: '8px' }}>Preferred Translation</p>
                 <p style={{ fontWeight: '600', color: '#111827', textTransform: 'uppercase' }}>{profile.preferredTranslation}</p>
               </div>
