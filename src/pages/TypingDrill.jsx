@@ -294,6 +294,7 @@ function TypingDrill() {
             <TypingDrillIntro 
               onStart={handleStart} 
               translation={translation} 
+              setTranslation={setTranslation}
               setDrillMode={setDrillMode}
               drillMode={drillMode} 
             />
@@ -308,6 +309,7 @@ function TypingDrill() {
               level={currentLevel}
               onBack={handleBack}
               drillMode={drillMode}
+              translation={translation}
             />
           )}
           {state === STATES.RESULTS && (

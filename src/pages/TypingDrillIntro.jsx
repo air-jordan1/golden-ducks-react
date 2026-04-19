@@ -4,6 +4,14 @@ import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { parseReference, fetchPassage } from '../Passage';
 
+const TRANSLATIONS = {
+  ASV: 'ASV — American Standard Version',
+  CSB: 'CSB - Christian Standard Bible',
+  KJV: 'KJV — King James Version',
+  NIV: 'NIV - New International Version',
+  NLT: 'NLT - New Living Translation',
+};
+
 const maxLevel = 4;
 
 const levelDescriptions = [
@@ -20,7 +28,7 @@ function getProgressKey(reference) {
 }
 
 // Prompt and setup screen
-function TypingDrillIntro({ onStart, translation, setDrillMode, drillMode }) {
+function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,6 +77,39 @@ function TypingDrillIntro({ onStart, translation, setDrillMode, drillMode }) {
 
   return (
     <div style={{ width: '100%' }}>
+      <p className="label-text" style={{ marginBottom: '8px' }}>Translation</p>
+      <div style={{ marginBottom: '16px' }}>
+        <select
+          value={translation}
+          onChange={e => {
+            setTranslation(e.target.value);
+            setFetchedText('');
+            setError('');
+            setVerseProgress(0);
+          }}
+          style={{
+            width: '100%',
+            padding: '12px 40px 12px 16px',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb',
+            backgroundColor: '#f9fafb',
+            fontSize: '16px',
+            color: '#111827',
+            outline: 'none',
+            cursor: 'pointer',
+            appearance: 'none',
+            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%236b7280"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>')`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 16px center',
+            backgroundSize: '20px',
+          }}
+        >
+          {Object.entries(TRANSLATIONS).map(([val, label]) => (
+            <option key={val} value={val}>{label}</option>
+          ))}
+        </select>
+      </div>
+
       <p className="label-text" style={{ marginBottom: '8px' }}>Verse reference</p>
       <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
         <input

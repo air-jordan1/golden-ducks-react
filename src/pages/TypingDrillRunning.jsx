@@ -66,14 +66,17 @@ function blankOutWords(text, difficulty) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, translation }) {
   userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
         <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
           Level {level} — {levelDescriptions[level - 1].desc}
+        </span>
+        <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
+          Translation: {translation}
         </span>
         <span className="label-text">Time: {time}s</span>
       </div>
@@ -184,7 +187,6 @@ const drill_input_container = {
   backgroundColor: '#f9fafb',
   fontSize: '16px',
   color: '#111827',
-  fontFamily: 'inherit',
   outline: 'none',
   resize: 'none',
   boxSizing: 'border-box',
@@ -204,7 +206,6 @@ const drill_background_layer = {
   fontSize: '16px', 
   display: "block",
   textAlign: 'left',
-  fontFamily: 'Courier New',
   lineHeight: '1.6',
   boxSizing: "border-box",
   padding: '12px',
@@ -224,7 +225,6 @@ const drill_overlay_input = {
   fontSize: "16px",
   display: "block",
   textAlign: 'left',
-  fontFamily: 'Courier New',
   lineHeight: '1.6',
   boxSizing: "border-box",
   padding: '12px',
@@ -232,7 +232,6 @@ const drill_overlay_input = {
   borderRadius: '12px',
   border: '1px solid #e5e7eb',
   fontFamily: 'Cascadia Code, monospace',
-
   resize: 'none',
   background: "transparent",
 }
