@@ -20,7 +20,7 @@ function getProgressKey(reference) {
 }
 
 // Prompt and setup screen
-function TypingDrillIntro({ onStart, translation }) {
+function TypingDrillIntro({ onStart, translation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -152,8 +152,26 @@ function TypingDrillIntro({ onStart, translation }) {
             style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
             onClick={() => onStart(fetchedText, reference.trim(), selectedLevel)}
           >
-            Start Level {selectedLevel}
+            Start Level {selectedLevel} in {drillMode} mode
           </button>
+
+          {drillMode === 'simple' && (
+            <button
+              className="btn-modern"
+              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
+              onClick={() => setDrillMode('overlay')}
+            >
+              Switch Mode
+          </button>)}
+
+          {drillMode === 'overlay' && (
+            <button
+              className="btn-modern"
+              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
+              onClick={() => setDrillMode('simple')}
+            >
+              Switch Mode
+          </button>)}
         </>
       )}
     </div>

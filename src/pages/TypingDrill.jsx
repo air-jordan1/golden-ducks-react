@@ -165,7 +165,7 @@ function TypingDrill() {
   useEffect(() => {
     if (isRunning) {
       timerRef.current = setInterval(() => setTime(t => t + 1), 1000);
-    } else {
+    } else { 
       clearInterval(timerRef.current);
     }
     return () => clearInterval(timerRef.current);

@@ -4,14 +4,6 @@ const maxLevel = 4;
 
 const COMPLETION_THRESHOLD = 90;
 
-// Clean verse numbers like [1], [2], etc.
-function cleanVerseNumbers(text) {
-  return text
-  .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
-  .replace('¶', '')
-  .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
-}
-
 // Converts a string like "John 3:16" to a safe string like "john_3_16" for 
 // easy behind the scenes storage and lookup of progress
 function getProgressKey(reference) {
@@ -56,7 +48,7 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
         <p className="label-text">You typed:</p>
         <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{userInput}"</p>
         <p className="label-text">Target:</p>
-        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{cleanVerseNumbers(currentPassage)}"</p>
+        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{currentPassage}"</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
