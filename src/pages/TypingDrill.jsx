@@ -5,14 +5,8 @@ import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, g
 import TypingDrillIntro from './TypingDrillIntro';
 import TypingDrillRunning from './TypingDrillRunning';
 import TypingDrillResults from './TypingDrillResults';
-
-const STATES = {
-  INTRO: 'intro',
-  RUNNING: 'running',
-  RESULTS: 'results'
-};
-
-const COMPLETION_THRESHOLD = 90;
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { maxLevel, STATES, COMPLETION_THRESHOLD } from './components/constants.js';
 
 // Parse the Scripture reference
 function parseReference(ref) {
@@ -147,6 +141,7 @@ function TypingDrill() {
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
   const [drillMode, setDrillMode] = useState('simple');
+  const { finalTranscript, listening, resetTranscript } = useSpeechRecognition();
 
   // set the translation
   useEffect(() => {
@@ -204,6 +199,7 @@ function TypingDrill() {
     const val = inputRef.current.value;
     let acc;
     if(drillMode === 'simple') {
+      
       acc = calcAccuracyDefault(val, currentPassage);
     }
     if(drillMode === 'overlay') {
@@ -251,7 +247,7 @@ function TypingDrill() {
           await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
         }
 
-        if (currentLevel === 4 && acc >= COMPLETION_THRESHOLD) {
+        if (currentLevel === maxLevel && acc >= COMPLETION_THRESHOLD) {
           await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
         }
       } catch (err) {
@@ -308,6 +304,9 @@ function TypingDrill() {
               level={currentLevel}
               onBack={handleBack}
               drillMode={drillMode}
+              finalTranscript={finalTranscript}
+              listening={listening}
+              resetTranscript={resetTranscript}
             />
           )}
           {state === STATES.RESULTS && (

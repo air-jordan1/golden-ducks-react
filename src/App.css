@@ -704,3 +704,102 @@ h1, h2, h3, h4, p, span, a {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ============================================================
+   TYPING DRILL PAGE
+   ============================================================ */
+.drill-input-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  gap: 1rem;
+}
+
+/* --- Simple Mode --- */
+.drill-text-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-size: 16px;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+.drill-audio-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.audio-button {
+  height: 50px;
+  width: 50px;
+  background: none;
+  background-color: #ffffff;
+  border: 1px solid #e8ddd4;
+  color: #1a1209;
+  padding: 10px;
+  margin: 1px;
+  text-decoration: none;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(26, 18, 9, 0.04);
+}
+
+/* --- Overlay Mode --- */
+.drill-background {
+  position:  absolute;
+  height:  100%; 
+  width:  100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size:  16px; 
+  display:  block;
+  text-align:  left;
+  font-family:  inherit;
+  line-height:  1.6;
+  box-sizing:  border-box;
+  padding:  12px;
+  color:  #374151; 
+  border-radius:  12px;
+  border:  1px solid #e5e7eb;
+  font-family:  Cascadia Code, monospace;
+}
+
+.drill-overlay {
+  position:  absolute;
+  height:  100%;
+  width:  100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size:  16px;
+  display:  block;
+  text-align:  left;
+  font-family:  inherit;
+  line-height:  1.6;
+  box-sizing:  border-box;
+  padding:  12px;
+  color:  #111827;
+  border-radius:  12px;
+  border:  1px solid #e5e7eb;
+  font-family:  Cascadia Code, monospace;
+
+  resize:  none;
+  background:  transparent;
+}
