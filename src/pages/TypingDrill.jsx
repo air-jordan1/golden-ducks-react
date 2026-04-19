@@ -290,6 +290,7 @@ function TypingDrill() {
             <TypingDrillIntro 
               onStart={handleStart} 
               translation={translation} 
+              setTranslation={setTranslation}
               setDrillMode={setDrillMode}
               drillMode={drillMode} 
             />

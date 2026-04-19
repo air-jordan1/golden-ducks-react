@@ -62,9 +62,12 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
         <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
           Level {level} — {levelDescriptions[level - 1].desc}
+        </span>
+        <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
+          Translation: {translation}
         </span>
         <span className="label-text">Time: {time}s</span>
       </div>
