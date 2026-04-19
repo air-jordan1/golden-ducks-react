@@ -27,19 +27,19 @@ function levelIdToName(level) {
   if (level === maxLevel) return (word) => '_'.repeat(word.length);
 }
 
-function levelOne(word) { // Level 1 difficulty: Here for easy polymorphism
+function levelOne(word, index) { // Level 1 difficulty: Here for easy polymorphism
   
   return word;
 }
 
-// Level 2 difficulty: Blank 30% of words (3 out of every 10)
+// Level 2 difficulty: Blank a third of words
 function levelTwo(word, index) {
-  if (index % 10 < 7) return word;
+  if (Math.floor(Math.random() * 10) % 3 !== 0) return word;
   else return '_'.repeat(word.length);
 }
 
 function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the words
-  if (index % 3 === 0) return word;
+  if (Math.floor(Math.random() * 10) % 3 === 0) return word;
   else return '_'.repeat(word.length);
 }
 
@@ -110,30 +110,22 @@ async function fetchPassage(parsed, translation) {
   if (parsed.type === 'verse') {
     const res = await fetch(`${base}/verses/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '');
+    return (await res.json()).data.content.replace('¶', '').trim();
   }
 
   if (parsed.type === 'range') {
     const res = await fetch(`${base}/passages/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '');
+    return (await res.json()).data.content.replace('¶', '').trim();
   }
 
   if (parsed.type === 'chapter') {
     const res = await fetch(`${base}/chapters/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
     if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '');
+    return (await res.json()).data.content.replace('¶', '').trim();
   }
 
   throw new Error();
-}
-
-// Clean verse numbers like [1], [2], etc.
-function cleanVerseNumbers(text) {
-  return text
-  .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
-  .replace('¶', '')
-  .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
 }
 
 // Normalize text to a common format for comparison (lowercase, remove punctuation, trim)
@@ -141,10 +133,22 @@ function normalize(text) {
   return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
 }
 
-// Calculate Accuracy
-function calcAccuracy(typed, target) {
+// Calculate Accuracy using a simple word-by-word comparison after normalization. Returns a percentage.
+function calcAccuracyDefault(typed, target) {
   const targetWords = normalize(target).split(/\s+/).filter(Boolean);
   const typedWords = normalize(typed).split(/\s+/).filter(Boolean);
+  if (!targetWords.length) return 0;
+  let correct = 0;
+  for (let i = 0; i < targetWords.length; i++) {
+    if (typedWords[i] === targetWords[i]) correct++;
+  }
+  return Math.round((correct / targetWords.length) * 100);
+}
+
+// Calculate Accuracy for the overlay method.
+function calcAccuracyOverlay(typed, target) {
+  const targetWords = target.split(/\s+/).filter(Boolean);
+  const typedWords = typed.split(/\s+/).filter(Boolean);
   if (!targetWords.length) return 0;
   let correct = 0;
   for (let i = 0; i < targetWords.length; i++) {
@@ -179,6 +183,7 @@ function TypingDrill() {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const [drillMode, setDrillMode] = useState('simple');
 
   // set the translation
   useEffect(() => {
@@ -233,8 +238,15 @@ function TypingDrill() {
 
   async function handleSubmit() {
     setIsRunning(false);
-    const val = cleanVerseNumbers(inputRef.current.value);
-    const acc = calcAccuracy(val, cleanVerseNumbers(currentPassage));
+    const val = inputRef.current.value;
+    let acc;
+    if(drillMode === 'simple') {
+      acc = calcAccuracyDefault(val, currentPassage);
+    }
+    if(drillMode === 'overlay') {
+      acc = calcAccuracyOverlay(val, currentPassage);
+    }
+
     setUserInput(val);
     setAccuracy(acc);
     const completed = acc >= COMPLETION_THRESHOLD;
@@ -316,7 +328,12 @@ function TypingDrill() {
         <HeaderArea />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           {state === STATES.INTRO && (
-            <TypingDrillIntro onStart={handleStart} translation={translation} />
+            <TypingDrillIntro 
+              onStart={handleStart} 
+              translation={translation} 
+              setDrillMode={setDrillMode}
+              drillMode={drillMode} 
+            />
           )}
           {state === STATES.RUNNING && (
             <TypingDrillRunning
@@ -327,6 +344,7 @@ function TypingDrill() {
               currentPassage={currentPassage}
               level={currentLevel}
               onBack={handleBack}
+              drillMode={drillMode}
             />
           )}
           {state === STATES.RESULTS && (
@@ -349,7 +367,7 @@ function TypingDrill() {
 }
 
 // Prompt and setup screen
-function TypingDrillIntro({ onStart, translation }) {
+function TypingDrillIntro({ onStart, translation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -361,7 +379,7 @@ function TypingDrillIntro({ onStart, translation }) {
   const handleLookup = async () => {
     const parsed = parseReference(reference);
     if (!parsed) {
-      setError('Something is wrong with the reference. Format like this: "John 3:16", "John 1:1-7", or "Proverbs 2"');
+      setError('Something is wrong with the reference. Format like "John 3:16", "John 1:1-7", or "Proverbs 2"');
       return;
     }
     setError('');
@@ -483,6 +501,22 @@ function TypingDrillIntro({ onStart, translation }) {
           >
             Start Level {selectedLevel}
           </button>
+          {drillMode === 'simple' && (
+            <button
+              className="btn-modern"
+              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
+              onClick={() => setDrillMode('overlay')}
+            >
+              Activate Overlay Mode
+          </button>)}
+          {drillMode === 'overlay' && (
+            <button
+              className="btn-modern"
+              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
+              onClick={() => setDrillMode('simple')}
+            >
+              Activate Simple Mode
+          </button>)}
         </>
       )}
     </div>
@@ -490,10 +524,9 @@ function TypingDrillIntro({ onStart, translation }) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack }) {
-  userSelect: 'none';
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode }) {
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', userSelect: 'none',}}>
       {/* Running time info */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
@@ -501,18 +534,8 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
         </span>
         <span className="label-text">Time: {time}s</span>
       </div>
-      {/* Verse reference */}
-      <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
-        <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
-          {blankOutWords(cleanVerseNumbers(currentPassage), levelIdToName(level))}
-        </p>
-      </div>
-      {/* Input field */}
-      <InputField
-        inputRef={inputRef}
-        handleKeyDown={handleKeyDown}
-        handleSubmit={handleSubmit}
-      />
+      {drillMode === 'simple' && simpleInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode)}
+      {drillMode === 'overlay' && overlayInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit,drillMode)}
 
       <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>
         Submit Result
@@ -522,6 +545,150 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
       </button>
     </div>
   );
+}
+
+function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode) {
+  
+  const handleInputKey = useCallback((event) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    } else {
+      handleKeyDown(event);
+    }
+  }, [handleKeyDown, handleSubmit]);
+
+  return (
+  <div> 
+    Test
+    {/* Verse reference */}
+    <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '16px' }} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+      <p style={{ margin: 0, fontStyle: 'italic', color: '#374151', fontSize: '16px', lineHeight: '1.6' }} onCopy={(e) => e.preventDefault()}>
+        {blankOutWords(currentPassage, level)}
+      </p>
+    </div>
+    Test
+    {/* Input field */}
+    <textarea
+      ref={inputRef}
+      name="drillInput"
+      rows={4}
+      placeholder="Timer starts when you start typing..."
+      style={{
+        width: '100%',
+        padding: '12px',
+        borderRadius: '12px',
+        border: '1px solid #e5e7eb',
+        backgroundColor: '#f9fafb',
+        fontSize: '16px',
+        color: '#111827',
+        fontFamily: 'inherit',
+        outline: 'none',
+        resize: 'none',
+        boxSizing: 'border-box',
+        lineHeight: '1.6',
+      }}
+      onKeyDown={handleInputKey}
+      autoComplete="off"
+      spellCheck="false"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    />
+  </div>);
+}
+
+function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit) {
+  const handleInputKey = useCallback((event) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    } else {
+      handleKeyDown(event);
+    }
+  }, [handleKeyDown, handleSubmit]);
+
+  return (
+  <div className="drill-input-container" style={drill_input_container}> 
+    {/* Verse reference */}
+    <div className="drill-background-layer"  onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
+      <p style={drill_background_layer} onCopy={(e) => e.preventDefault()}>
+        {blankOutWords(currentPassage, level)}
+      </p>
+    </div>
+    {/* Input field */}
+    <textarea
+      className="drill-overlay-input"
+      style={drill_overlay_input}
+      ref={inputRef}
+      name="drillInput"
+      rows={4}
+      onKeyDown={handleInputKey}
+      autoComplete="off"
+      spellCheck="false"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    />
+  </div>);
+}
+
+const drill_input_container = {
+  width: '100%',
+  height: '400px',
+  padding: '12px',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+  backgroundColor: '#f9fafb',
+  fontSize: '16px',
+  color: '#111827',
+  fontFamily: 'inherit',
+  outline: 'none',
+  resize: 'none',
+  boxSizing: 'border-box',
+  lineHeight: '1.6',
+  position: 'relative',
+  display: 'inline-block',
+  fontFamily: 'Courier New',
+}
+
+const drill_background_layer = {
+  position: "absolute",
+  height: '100%', 
+  width: "100%",
+  top: 0,
+  left: 0,
+  margin: 0, 
+  fontSize: '16px', 
+  display: "block",
+  textAlign: 'left',
+  fontFamily: 'Courier New',
+  lineHeight: '1.6',
+  boxSizing: "border-box",
+  padding: '12px',
+  color: '#374151', 
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+}
+
+const drill_overlay_input = {
+  position: "absolute",
+  height: '100%',
+  width: "100%",
+  top: 0,
+  left: 0,
+  margin: 0,
+  fontSize: "16px",
+  display: "block",
+  textAlign: 'left',
+  fontFamily: 'Courier New',
+  lineHeight: '1.6',
+  boxSizing: "border-box",
+  padding: '12px',
+  color: '#111827',
+  borderRadius: '12px',
+  border: '1px solid #e5e7eb',
+
+  resize: 'none',
+  background: "transparent",
 }
 
 // Results screen
@@ -562,7 +729,7 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
         <p className="label-text">You typed:</p>
         <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{userInput}"</p>
         <p className="label-text">Target:</p>
-        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{cleanVerseNumbers(currentPassage)}"</p>
+        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{currentPassage}"</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -600,45 +767,6 @@ function HeaderArea() {
       <h1 className="title">Typing Drill</h1>
       <p className="subtitle">Test your speed and accuracy.</p>
     </div>
-  );
-}
-
-function InputField({ inputRef, handleKeyDown, handleSubmit }) {
-  const handleInputKey = useCallback((event) => {
-    if (event.key === 'Enter') {
-      handleSubmit();
-    } else {
-      handleKeyDown(event);
-    }
-  }, [handleKeyDown, handleSubmit]);
-
-  return (
-    <textarea
-      ref={inputRef}
-      name="drillInput"
-      rows={4}
-      placeholder="Start typing here..."
-      style={{
-        width: '100%',
-        padding: '12px',
-        borderRadius: '12px',
-        border: '1px solid #e5e7eb',
-        backgroundColor: '#f9fafb',
-        fontSize: '16px',
-        color: '#111827',
-        fontFamily: 'inherit',
-        outline: 'none',
-        resize: 'none',
-        boxSizing: 'border-box',
-        lineHeight: '1.6',
-      }}
-      onKeyDown={handleInputKey}
-      autoComplete="off"
-      spellCheck="false"
-      onCopy={(e) => e.preventDefault()}
-      onCut={(e) => e.preventDefault()}
-      onPaste={(e) => e.preventDefault()}
-    />
   );
 }
 
