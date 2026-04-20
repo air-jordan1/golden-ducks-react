@@ -75,9 +75,9 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', justifyContent: 'center', display: 'flex' , alignItems: 'center', flexDirection: 'column' }}>
       <p className="label-text">Verse reference</p>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+      <div className="verse-reference-input-group">
         <input
           type="text"
           value={reference}

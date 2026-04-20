@@ -283,7 +283,7 @@ function TypingDrill() {
 
   return (
     <div className="page-container">
-      <div className="modern-card welcome-card" style={{ marginTop: '20px' }}>
+      <div className="modern-card drill-card" style={{ marginTop: '20px' }}>
         <HeaderArea />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           {state === STATES.INTRO && (

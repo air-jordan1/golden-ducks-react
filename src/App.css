@@ -442,23 +442,29 @@ body {
 @media (max-width: 960px) {
   .sidebar {
     width: 60px;
+    height: 100vh;
   }
+
   .sidebar-header,
   .sidebar-item span,
   .sidebar-user {
     display: none;
   }
+
   .sidebar-item {
     justify-content: center;
   }
+
   .sidebar-avatar {
     width: 40px;
     height: 40px;
     font-size: 16px;
   }
+
   .sidebar-divider {
     margin: 0;
   }
+
   .sidebar-footer {
     padding: 0;
   }
@@ -571,6 +577,11 @@ body {
    INNER PAGES (Account, Settings, TypingDrill)
    ============================================================ */
 
+.welcome-card {
+  max-width: 600px;
+  padding: 60px 40px;
+}
+
 .page-container {
   display: flex;
   flex-direction: column;
@@ -591,7 +602,7 @@ body {
   max-width: 380px;
 }
 
-.welcome-card {
+.drill-card {
   max-width: 600px;
   padding: 60px 40px;
 }
@@ -614,6 +625,33 @@ body {
 .account-col-right {
   max-height: 480px;
   overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    background: #faf8f5;
+  }
+
+  .modern-card {
+    background-color: #ffffff;
+    padding: 48px 40px;
+    border-radius: 24px;
+    box-shadow: 0 4px 24px rgba(26, 18, 9, 0.07);
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .drill-card {
+    max-width: 600px;
+    padding: 60px 40px;
+  }
 }
 
 h1,
@@ -792,10 +830,25 @@ a {
   transform: translateY(-1px);
 }
 
+.verse-reference-input-group {
+   display: flex;
+   gap: 8px;
+   align-items: stretch;
+   flex-direction: row;
+}
+
+@media (max-width: 768px) {
+  .verse-reference-input-group {
+    flex-direction: column;
+    width: 50%;
+    align-items: center;
+  }
+}
+
 .drill-input-container {
   position: relative;
   width: 100%;
-  max-width: 800px;
+  /*max-width: 80%;*/
   margin: 0 auto;
   display: grid;
   grid-template-columns: 5fr 1fr;
@@ -848,6 +901,18 @@ a {
   border-color: #c8b8a8;
   box-shadow: 0 6px 16px rgba(26, 18, 9, 0.08);
   transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .drill-input-container {
+    grid-template-columns: 1fr;
+  }
+
+  .drill-audio-input {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 12px;
+  }
 }
 
 /* --- Overlay Mode --- */
