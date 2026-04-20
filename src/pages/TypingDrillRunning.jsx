@@ -147,7 +147,6 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
             {listening &&
               <button className="audio-button" onClick={SpeechRecognition.stopListening}>🔴</button>
             }
-            <button className="audio-button" onClick={resetTranscript}>↺</button>
             <p>{listening ? "Listening" : "Paused"}</p>
             <p>{finalTranscript}</p>
           </div>

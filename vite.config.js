@@ -5,6 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
    build: {
-    outDir: 'public', // This outputs "npm run build" to the "public" directory for deployment to firebase
+    outDir: 'builtFiles', // This outputs "npm run build" to the "builtFiles" directory for deployment to firebase
   },
 })
