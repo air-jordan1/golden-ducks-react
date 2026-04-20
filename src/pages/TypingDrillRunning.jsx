@@ -86,7 +86,9 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
       resetTranscript(); // Clear the transcript after appending to avoid duplicates
     }
   }, [finalTranscript, resetTranscript]);
+  
   const startListening = useCallback(() => {
+    console.log('Starting to listen...');
     SpeechRecognition.startListening({ continuous: true, interimResults: true });
   }, []);
 
@@ -117,13 +119,12 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
         {audioSupported &&
           <div className="drill-audio-input">
             {!listening &&
-              <button className="audio-button" onClick={startListening}>▶</button>
+              <button className="audio-button" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
             }
             {listening &&
               <button className="audio-button" onClick={SpeechRecognition.stopListening}>🔴</button>
             }
             <p>{listening ? "Listening" : "Paused"}</p>
-            <p>{finalTranscript}</p>
           </div>
         }
       </div>

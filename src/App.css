@@ -320,7 +320,7 @@ body {
 
 /* --- Sidebar --- */
 .sidebar {
-  width: 240px;
+  width: 15%;
   flex-shrink: 0;
   background: #1a1209;
   display: flex;
@@ -436,6 +436,32 @@ body {
 .sidebar-signout:hover {
   color: #faf8f5;
   background: rgba(139, 0, 0, 0.15);
+}
+
+/* For mobile, collapse sidebar to icons only and hide text labels */
+@media (max-width: 960px) {
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar-header,
+  .sidebar-item span,
+  .sidebar-user {
+    display: none;
+  }
+  .sidebar-item {
+    justify-content: center;
+  }
+  .sidebar-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  .sidebar-divider {
+    margin: 0;
+  }
+  .sidebar-footer {
+    padding: 0;
+  }
 }
 
 /* ============================================================
