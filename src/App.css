@@ -818,6 +818,12 @@ a {
   box-shadow: 0 2px 6px rgba(26, 18, 9, 0.04);
 }
 
+.audio-button:hover {
+  border-color: #c8b8a8;
+  box-shadow: 0 6px 16px rgba(26, 18, 9, 0.08);
+  transform: translateY(-1px);
+}
+
 /* --- Overlay Mode --- */
 .drill-background {
   position: absolute;
