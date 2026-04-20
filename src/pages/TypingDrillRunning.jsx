@@ -1,8 +1,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import '../App.css';
-import { auth, db } from "../firebase";
 import VoiceInputTest from './AudioTest.jsx';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import SpeechRecognition from 'react-speech-recognition';
 import { maxLevel, levelDescriptions } from './components/constants.js';
 
 function levelIdToName(level) {
@@ -27,29 +26,6 @@ function levelThree(word, index) {// Level 3 difficulty: Blank two-thirds the wo
   else return '_'.repeat(word.length);
 }
 
-// Normalize text to a common format for comparison (lowercase, remove punctuation, trim)
-function normalize(text) {
-  return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
-}
-
-// Calculate Accuracy
-function calcAccuracy(typed, target) {
-  const targetWords = normalize(target).split(/\s+/).filter(Boolean);
-  const typedWords = normalize(typed).split(/\s+/).filter(Boolean);
-  if (!targetWords.length) return 0;
-  let correct = 0;
-  for (let i = 0; i < targetWords.length; i++) {
-    if (typedWords[i] === targetWords[i]) correct++;
-  }
-  return Math.round((correct / targetWords.length) * 100);
-}
-
-// Converts a string like "John 3:16" to a safe string like "john_3_16" for 
-// easy behind the scenes storage and lookup of progress
-function getProgressKey(reference) {
-  return reference.replace(/[\s:.]/g, '_');
-}
-
 // Blank words for increasing difficulty
 function blankOutWords(text, difficulty) {
   const words = text.trim().split(' ');
@@ -58,7 +34,6 @@ function blankOutWords(text, difficulty) {
 
 // Drilling screen
 function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
-  userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
@@ -100,7 +75,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
   }, [handleKeyDown, handleSubmit]);
 
   const [userInput, setUserInput] = useState('');
-  const clearInput = () => setUserInput('');
+  //const clearInput = () => setUserInput('');
 
   // When voice transcript updates, append it to the textarea state
   useEffect(() => {
@@ -168,14 +143,13 @@ function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handle
     <div className="drill-input-container">
       {/* Verse reference */}
       <div className="drill-background" onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
-        <p style={drill_background_layer} onCopy={(e) => e.preventDefault()}>
+        <p onCopy={(e) => e.preventDefault()}>
           {blankOutWords(currentPassage, level)}
         </p>
       </div>
       {/* Input field */}
       <textarea
         className="drill-overlay"
-        style={drill_overlay_input}
         ref={inputRef}
         rows={4}
         onKeyDown={handleInputKey}
