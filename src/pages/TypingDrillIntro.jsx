@@ -3,23 +3,7 @@ import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { parseReference, fetchPassage } from '../Passage';
-
-const TRANSLATIONS = {
-  ASV: 'ASV — American Standard Version',
-  CSB: 'CSB - Christian Standard Bible',
-  KJV: 'KJV — King James Version',
-  NIV: 'NIV - New International Version',
-  NLT: 'NLT - New Living Translation',
-};
-
-const maxLevel = 4;
-
-const levelDescriptions = [
-    { level: 1, label: 'Level 1', desc: 'Full verse shown — type it out' },
-    { level: 2, label: 'Level 2', desc: '30% of words hidden — fill in the blanks' },
-    { level: 3, label: 'Level 3', desc: '66% of words hidden — fill in the blanks' },
-    { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
-  ];
+import { maxLevel, TRANSLATIONS_CONCISE, levelDescriptions } from './components/constants';
 
 // Converts a string like "John 3:16" to a safe string like "john_3_16" for 
 // easy behind the scenes storage and lookup of progress
@@ -75,61 +59,34 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     }
   };
 
+  function TranslationSelector() {
+    return (
+      <select
+        name="test"
+        value={translation}
+        className="select"
+        onChange={e => {handleLookup(); setTranslation(e.target.value);
+        }}>
+        {Object.entries(TRANSLATIONS_CONCISE).map(([val, label]) => (
+          <option key={val} value={val}>{label}</option>
+        ))}
+      </select>
+    );
+  }
+
   return (
     <div style={{ width: '100%' }}>
-      <p className="label-text" style={{ marginBottom: '8px' }}>Translation</p>
-      <div style={{ marginBottom: '16px' }}>
-        <select
-          value={translation}
-          onChange={e => {
-            setTranslation(e.target.value);
-            setFetchedText('');
-            setError('');
-            setVerseProgress(0);
-          }}
-          style={{
-            width: '100%',
-            padding: '12px 40px 12px 16px',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb',
-            fontSize: '16px',
-            color: '#111827',
-            outline: 'none',
-            cursor: 'pointer',
-            appearance: 'none',
-            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%236b7280"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>')`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 16px center',
-            backgroundSize: '20px',
-          }}
-        >
-          {Object.entries(TRANSLATIONS).map(([val, label]) => (
-            <option key={val} value={val}>{label}</option>
-          ))}
-        </select>
-      </div>
-
-      <p className="label-text" style={{ marginBottom: '8px' }}>Verse reference</p>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      <p className="label-text">Verse reference</p>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
         <input
           type="text"
           value={reference}
           onChange={e => { setReference(e.target.value); setFetchedText(''); setError(''); setVerseProgress(0); }}
           onKeyDown={e => e.key === 'Enter' && handleLookup()}
           placeholder="e.g. John 3:16, John 1:1-7, Proverbs 2"
-          style={{
-            flex: 1,
-            padding: '12px 16px',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb',
-            fontSize: '16px',
-            color: '#111827',
-            fontFamily: 'inherit',
-            outline: 'none',
-          }}
+          className="input"
         />
+        <TranslationSelector />
         <button className="btn-modern" onClick={handleLookup} disabled={loading || !reference.trim()}>
           {loading ? '...' : 'Look up'}
         </button>
@@ -203,7 +160,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
               onClick={() => setDrillMode('overlay')}
             >
               Switch Mode
-          </button>)}
+            </button>)}
 
           {drillMode === 'overlay' && (
             <button
@@ -212,7 +169,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
               onClick={() => setDrillMode('simple')}
             >
               Switch Mode
-          </button>)}
+            </button>)}
         </>
       )}
     </div>

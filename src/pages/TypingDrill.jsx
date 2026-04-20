@@ -308,6 +308,7 @@ function TypingDrill() {
               finalTranscript={finalTranscript}
               listening={listening}
               resetTranscript={resetTranscript}
+              translation={translation} 
             />
           )}
           {state === STATES.RESULTS && (

@@ -57,7 +57,7 @@ function blankOutWords(text, difficulty) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, finalTranscript, listening, resetTranscript }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
   userSelect: 'none';
   return (
     <div style={{ width: '100%' }}>

@@ -11,5 +11,19 @@ export const levelDescriptions = [
   { level: 3, label: 'Level 3', desc: '66% of words hidden — fill in the blanks' },
   { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
 ];
+export const TRANSLATIONS = {
+  ASV: 'ASV — American Standard Version',
+  CSB: 'CSB - Christian Standard Bible',
+  KJV: 'KJV — King James Version',
+  NIV: 'NIV - New International Version',
+  NLT: 'NLT - New Living Translation',
+};
+export const TRANSLATIONS_CONCISE = {
+  ASV: 'ASV',
+  CSB: 'CSB',
+  KJV: 'KJV',
+  NIV: 'NIV',
+  NLT: 'NLT',
+};
 
 export default maxLevel;

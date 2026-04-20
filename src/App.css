@@ -376,17 +376,17 @@ body {
 }
 
 .sidebar-item:hover {
-  background: rgba(255,255,255,0.07);
+  background: rgba(255, 255, 255, 0.07);
   color: #ffffff;
 }
 
 .sidebar-item--active {
-  background: rgba(139,0,0,0.25);
+  background: rgba(139, 0, 0, 0.25);
   color: #ffffff;
 }
 
 .sidebar-item--active:hover {
-  background: rgba(139,0,0,0.32);
+  background: rgba(139, 0, 0, 0.32);
   color: #ffffff;
 }
 
@@ -396,7 +396,7 @@ body {
 
 .sidebar-divider {
   height: 1px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   margin-bottom: 14px;
 }
 
@@ -435,7 +435,7 @@ body {
 
 .sidebar-signout:hover {
   color: #faf8f5;
-  background: rgba(139,0,0,0.15);
+  background: rgba(139, 0, 0, 0.15);
 }
 
 /* ============================================================
@@ -509,9 +509,17 @@ body {
   font-size: 22px;
 }
 
-.icon-blue  { background: #fef2f2; }
-.icon-green { background: #fdf5ec; }
-.icon-purple { background: #f3eeea; }
+.icon-blue {
+  background: #fef2f2;
+}
+
+.icon-green {
+  background: #fdf5ec;
+}
+
+.icon-purple {
+  background: #f3eeea;
+}
 
 .dashboard-card h3 {
   font-size: 18px;
@@ -582,7 +590,13 @@ body {
   overflow-y: auto;
 }
 
-h1, h2, h3, h4, p, span, a {
+h1,
+h2,
+h3,
+h4,
+p,
+span,
+a {
   color: #1a1209;
 }
 
@@ -614,6 +628,7 @@ h1, h2, h3, h4, p, span, a {
   font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, #8b0000 0%, #6b4422 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   word-break: break-all;
@@ -701,13 +716,56 @@ h1, h2, h3, h4, p, span, a {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ============================================================
    TYPING DRILL PAGE
    ============================================================ */
+
+.input {
+  flex: 1;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-size: 16px;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+}
+
+.select {
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1px solid #e8ddd4;
+  background-color: #ffffff;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 400;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.select:hover {
+  border-color: #c8b8a8;
+  box-shadow: 0 6px 16px rgba(26, 18, 9, 0.08);
+  transform: translateY(-1px);
+}
+
 .drill-input-container {
   position: relative;
   width: 100%;
@@ -762,44 +820,44 @@ h1, h2, h3, h4, p, span, a {
 
 /* --- Overlay Mode --- */
 .drill-background {
-  position:  absolute;
-  height:  100%; 
-  width:  100%;
+  position: absolute;
+  height: 100%;
+  width: 100%;
   top: 0;
   left: 0;
   margin: 0;
-  font-size:  16px; 
-  display:  block;
-  text-align:  left;
-  font-family:  inherit;
-  line-height:  1.6;
-  box-sizing:  border-box;
-  padding:  12px;
-  color:  #374151; 
-  border-radius:  12px;
-  border:  1px solid #e5e7eb;
-  font-family:  Cascadia Code, monospace;
+  font-size: 16px;
+  display: block;
+  text-align: left;
+  font-family: inherit;
+  line-height: 1.6;
+  box-sizing: border-box;
+  padding: 12px;
+  color: #374151;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-family: Cascadia Code, monospace;
 }
 
 .drill-overlay {
-  position:  absolute;
-  height:  100%;
-  width:  100%;
+  position: absolute;
+  height: 100%;
+  width: 100%;
   top: 0;
   left: 0;
   margin: 0;
-  font-size:  16px;
-  display:  block;
-  text-align:  left;
-  font-family:  inherit;
-  line-height:  1.6;
-  box-sizing:  border-box;
-  padding:  12px;
-  color:  #111827;
-  border-radius:  12px;
-  border:  1px solid #e5e7eb;
-  font-family:  Cascadia Code, monospace;
+  font-size: 16px;
+  display: block;
+  text-align: left;
+  font-family: inherit;
+  line-height: 1.6;
+  box-sizing: border-box;
+  padding: 12px;
+  color: #111827;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-family: Cascadia Code, monospace;
 
-  resize:  none;
-  background:  transparent;
+  resize: none;
+  background: transparent;
 }
