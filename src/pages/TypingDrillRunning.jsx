@@ -141,7 +141,7 @@ function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handle
   }, [handleKeyDown, handleSubmit]);
 
   return (
-    <div className="drill-input-container">
+    <div className="drill-overlay-container">
       {/* Verse reference */}
       <div className="drill-background" onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()} onPaste={(e) => e.preventDefault()}>
         <p onCopy={(e) => e.preventDefault()}>
@@ -152,7 +152,6 @@ function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handle
       <textarea
         className="drill-overlay"
         ref={inputRef}
-        rows={4}
         onKeyDown={handleInputKey}
         autoComplete="off"
         spellCheck="false"
