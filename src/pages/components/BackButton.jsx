@@ -12,7 +12,7 @@ function BackButton() {
         onMouseOver={(e) => e.currentTarget.style.color = '#111827'}
         onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
       >
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         Back

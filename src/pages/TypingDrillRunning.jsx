@@ -68,6 +68,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
 
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
+      event.preventDefault();
       handleSubmit();
     } else {
       handleKeyDown(event);
@@ -119,10 +120,10 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
         {audioSupported &&
           <div className="drill-audio-input">
             {!listening &&
-              <button className="audio-button" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
+              <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
             }
             {listening &&
-              <button className="audio-button" onClick={SpeechRecognition.stopListening}>🔴</button>
+              <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
             }
             <p>{listening ? "Listening" : "Paused"}</p>
           </div>
@@ -134,6 +135,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
 function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit) {
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
+      event.preventDefault();
       handleSubmit();
     } else {
       handleKeyDown(event);
