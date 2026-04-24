@@ -139,11 +139,17 @@ function Account() {
           {/* Right column */}
           <div className="account-col-right">
             <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
-              Drill History ({drillResults.length})
+              Drill History{drillResults.length > 0 ? ` (${drillResults.length})` : ''}
             </h2>
 
             {drillResults.length === 0 ? (
-              <p className="label-text">No completed drills yet.</p>
+              <div className="empty-state">
+                <p className="empty-state-title">No drills completed yet</p>
+                <p className="empty-state-subtitle">Complete a drill at 90%+ accuracy<br/>to see your history here.</p>
+                <button className="empty-state-btn" onClick={() => navigate('/typing-drill')}>
+                  Start your first drill
+                </button>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {drillResults.map(result => (

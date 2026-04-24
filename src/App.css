@@ -1040,3 +1040,48 @@ a {
   color: #9ca3af;
   margin-left: 4px;
 }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  gap: 10px;
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1209;
+  margin: 0;
+}
+
+.empty-state-subtitle {
+  font-size: 14px;
+  color: #6b5c4e;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.empty-state-btn {
+  margin-top: 6px;
+  padding: 10px 24px;
+  background: #8b0000;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.empty-state-btn:hover {
+  background: #6b0000;
+}
