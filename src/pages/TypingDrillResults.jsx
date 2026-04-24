@@ -1,18 +1,62 @@
 import '../App.css';
 
 const maxLevel = 4;
-
 const COMPLETION_THRESHOLD = 90;
 
-// Converts a string like "John 3:16" to a safe string like "john_3_16" for 
-// easy behind the scenes storage and lookup of progress
-function getProgressKey(reference) {
-  return reference.replace(/[\s:.]/g, '_');
+function normWord(w) {
+  return w.toLowerCase().replace(/[^\w]/g, '');
 }
 
-// Results screen
+function buildDiff(userInput, target) {
+  const targetWords = target.trim().split(/\s+/).filter(Boolean);
+  const typedWords = userInput.trim().split(/\s+/).filter(Boolean);
+  return targetWords.map((word, i) => {
+    const typed = typedWords[i];
+    if (!typed) return { word, typed: null, status: 'missing' };
+    if (normWord(typed) === normWord(word)) return { word, typed, status: 'correct' };
+    return { word, typed, status: 'wrong' };
+  });
+}
+
+function WordDiff({ userInput, target }) {
+  const diff = buildDiff(userInput, target);
+  const typedWordCount = userInput.trim().split(/\s+/).filter(Boolean).length;
+  const targetWordCount = target.trim().split(/\s+/).filter(Boolean).length;
+  const extraCount = Math.max(0, typedWordCount - targetWordCount);
+
+  return (
+    <div className="diff-container">
+      <p className="label-text" style={{ marginBottom: '12px' }}>Word breakdown</p>
+      <div className="diff-words">
+        {diff.map(({ word, typed, status }, i) => (
+          <span
+            key={i}
+            className={`diff-word diff-word--${status}`}
+            title={status === 'wrong' && typed ? `You typed: "${typed}"` : undefined}
+          >
+            {word}
+          </span>
+        ))}
+      </div>
+      <div className="diff-legend">
+        <span className="diff-legend-item diff-legend-item--correct">Correct</span>
+        <span className="diff-legend-item diff-legend-item--wrong">Wrong</span>
+        <span className="diff-legend-item diff-legend-item--missing">Missing</span>
+        {extraCount > 0 && (
+          <span className="diff-extra">
+            +{extraCount} extra word{extraCount !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, levelCompleted, onRestart, onNextLevel, onRetry }) {
   const accuracyColor = accuracy >= 90 ? '#10b981' : accuracy >= 70 ? '#f59e0b' : '#ef4444';
+  const diff = buildDiff(userInput, currentPassage);
+  const correctCount = diff.filter(d => d.status === 'correct').length;
+  const totalCount = currentPassage.trim().split(/\s+/).filter(Boolean).length;
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
@@ -22,7 +66,8 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
       {levelCompleted ? (
         <div style={{ backgroundColor: '#d1fae5', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px' }}>
           <p style={{ margin: 0, color: '#065f46', fontWeight: '600', fontSize: '15px' }}>
-            Level {level} completed! {level < maxLevel ? `Try Level ${level + 1} next.` : 'You have this verse memorized!'}
+            Level {level} completed!{' '}
+            {level < maxLevel ? `Try Level ${level + 1} next.` : 'You have this verse memorized!'}
           </p>
         </div>
       ) : (
@@ -42,21 +87,18 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
           <p className="label-text" style={{ margin: '0 0 4px 0' }}>Accuracy</p>
           <p style={{ fontSize: '22px', fontWeight: '700', color: accuracyColor, margin: 0 }}>{accuracy}%</p>
         </div>
+        <div style={{ backgroundColor: '#f9fafb', padding: '16px 24px', borderRadius: '12px', flex: 1 }}>
+          <p className="label-text" style={{ margin: '0 0 4px 0' }}>Words</p>
+          <p style={{ fontSize: '22px', fontWeight: '700', color: '#1a1209', margin: 0 }}>
+            {correctCount}<span style={{ fontSize: '14px', fontWeight: '500', color: '#9ca3af' }}>/{totalCount}</span>
+          </p>
+        </div>
       </div>
 
-      <div style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '12px', textAlign: 'left', marginBottom: '20px' }}>
-        <p className="label-text">You typed:</p>
-        <p style={{ fontSize: '15px', color: '#111827', margin: '0 0 16px 0' }}>"{userInput}"</p>
-        <p className="label-text">Target:</p>
-        <p style={{ fontSize: '15px', color: '#6b7280', margin: 0 }}>"{currentPassage}"</p>
-      </div>
+      <WordDiff userInput={userInput} target={currentPassage} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <button
-          className="btn-modern"
-          style={{ width: '100%' }}
-          onClick={onRetry}
-        >
+        <button className="btn-modern" style={{ width: '100%' }} onClick={onRetry}>
           Try again
         </button>
         {levelCompleted && level < maxLevel && (
@@ -68,11 +110,7 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
             Advance to Level {level + 1}
           </button>
         )}
-        <button
-          className="btn-modern"
-          style={{ width: '100%' }}
-          onClick={onRestart}
-        >
+        <button className="btn-modern" style={{ width: '100%' }} onClick={onRestart}>
           Try a Different Verse
         </button>
       </div>

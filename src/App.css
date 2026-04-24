@@ -959,3 +959,84 @@ a {
   resize: none;
   background: transparent;
 }
+
+/* ============================================================
+   TYPING DRILL RESULTS — WORD DIFF
+   ============================================================ */
+
+.diff-container {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.diff-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  line-height: 2;
+}
+
+.diff-word {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: 'Cascadia Code', monospace;
+  font-size: 14px;
+  cursor: default;
+  transition: opacity 0.1s;
+}
+
+.diff-word--correct {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.diff-word--wrong {
+  background: #fee2e2;
+  color: #991b1b;
+  text-decoration: line-through;
+  text-decoration-color: #f87171;
+}
+
+.diff-word--missing {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.diff-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.diff-legend-item {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.diff-legend-item--correct {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.diff-legend-item--wrong {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.diff-legend-item--missing {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.diff-extra {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-left: 4px;
+}
