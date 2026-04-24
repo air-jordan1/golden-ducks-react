@@ -100,31 +100,29 @@ function Account() {
           {/* Left column */}
           <div className="account-col-left">
             {profile && (
-              <div style={{ marginBottom: '24px' }}>
+              <div className="profile-section">
                 <p className="label-text">Email</p>
-                <p style={{ fontWeight: '600', color: '#111827' }}>{profile.email}</p>
+                <p className="field-value">{profile.email}</p>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <p style={{ fontWeight: '600', color: '#111827' }}>{profile.username || profile.email}</p>
-                  <button onClick={handleChangeUsername} className="btn-modern" style={{ fontSize: '12px', padding: '4px 8px' }}>Change Username</button>
+                <div className="username-row">
+                  <p className="field-value">{profile.username || profile.email}</p>
+                  <button onClick={handleChangeUsername} className="btn-modern btn-xs">Change Username</button>
                 </div>
-                {error && <p style={{ color: 'red', fontSize: '14px', marginTop: '8px' }}>{error}</p>}
+                {error && <p className="account-error">{error}</p>}
 
                 <p className="label-text" style={{ marginTop: '8px' }}>Preferred Translation</p>
-                <p style={{ fontWeight: '600', color: '#111827', textTransform: 'uppercase' }}>{profile.preferredTranslation}</p>
+                <p className="field-value field-value--upper">{profile.preferredTranslation}</p>
               </div>
             )}
 
             {profile?.memorizedVerses?.length > 0 && (
-              <div style={{ marginBottom: '24px' }}>
-                <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
-                  Memorized Verses
-                </h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="profile-section">
+                <h2 className="subtitle subtitle--strong">Memorized Verses</h2>
+                <div className="memorized-verses-list">
                   {profile.memorizedVerses.map(ref => (
-                    <div key={ref} style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f0fdf4', padding: '12px 16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                      <span style={{ fontSize: '18px' }}>✓</span>
-                      <p style={{ margin: 0, fontWeight: '600', color: '#111827' }}>{ref}</p>
+                    <div key={ref} className="memorized-verse-item">
+                      <span className="verse-checkmark">✓</span>
+                      <p className="verse-ref">{ref}</p>
                     </div>
                   ))}
                 </div>
@@ -138,7 +136,7 @@ function Account() {
 
           {/* Right column */}
           <div className="account-col-right">
-            <h2 className="subtitle" style={{ fontWeight: '700', color: '#111827', marginBottom: '12px' }}>
+            <h2 className="subtitle subtitle--strong">
               Drill History{drillResults.length > 0 ? ` (${drillResults.length})` : ''}
             </h2>
 
@@ -153,25 +151,12 @@ function Account() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {drillResults.map(result => (
-                  <div key={result.id} style={{ backgroundColor: '#f9fafb', padding: '14px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div key={result.id} className="drill-result-card">
                     <div>
-                      <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#111827', fontSize: '15px' }}>
-                        {result.reference || '—'}
-                      </p>
-                      <p style={{ margin: 0, fontSize: '13px', color: '#6b7280' }}>
-                        {result.completedAt?.toDate().toLocaleDateString()}
-                      </p>
+                      <p className="drill-result-ref">{result.reference || '—'}</p>
+                      <p className="drill-result-date">{result.completedAt?.toDate().toLocaleDateString()}</p>
                     </div>
-                    <span style={{
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      backgroundColor: '#111827',
-                      color: '#ffffff',
-                      padding: '4px 10px',
-                      borderRadius: '20px',
-                    }}>
-                      Level {result.level ?? 1}
-                    </span>
+                    <span className="drill-result-badge">Level {result.level ?? 1}</span>
                   </div>
                 ))}
               </div>

@@ -5,13 +5,10 @@ import { doc, getDoc } from "firebase/firestore";
 import { parseReference, fetchPassage } from '../Passage';
 import { maxLevel, TRANSLATIONS_CONCISE, levelDescriptions } from './components/constants';
 
-// Converts a string like "John 3:16" to a safe string like "john_3_16" for 
-// easy behind the scenes storage and lookup of progress
 function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
 }
 
-// Prompt and setup screen
 function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
@@ -65,8 +62,8 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
         name="test"
         value={translation}
         className="select"
-        onChange={e => {handleLookup(); setTranslation(e.target.value);
-        }}>
+        onChange={e => { handleLookup(); setTranslation(e.target.value); }}
+      >
         {Object.entries(TRANSLATIONS_CONCISE).map(([val, label]) => (
           <option key={val} value={val}>{label}</option>
         ))}
@@ -75,7 +72,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
   }
 
   return (
-    <div style={{ width: '100%', justifyContent: 'center', display: 'flex' , alignItems: 'center', flexDirection: 'column' }}>
+    <div className="drill-intro-wrapper">
       <p className="label-text">Verse reference</p>
       <div className="verse-reference-input-group">
         <input
@@ -92,14 +89,12 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
         </button>
       </div>
 
-      {error && (
-        <p style={{ color: '#ef4444', fontSize: '14px', marginBottom: '16px' }}>{error}</p>
-      )}
+      {error && <p className="intro-error">{error}</p>}
 
       {fetchedText && (
         <>
-          <div style={{ backgroundColor: '#f3f4f6', padding: '16px', borderRadius: '8px', marginBottom: '20px' }}>
-            <p style={{ margin: 0, fontStyle: 'italic', color: '#374151' }}>{fetchedText}</p>
+          <div className="verse-preview">
+            <p>{fetchedText}</p>
           </div>
 
           {!progressLoading && (
@@ -111,34 +106,19 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
           )}
 
           <p className="label-text" style={{ marginBottom: '10px' }}>Select a level</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
+          <div className="level-selector">
             {levelDescriptions.map(({ level, label, desc }) => {
               const isSelected = selectedLevel === level;
               return (
                 <button
                   key={level}
                   onClick={() => setSelectedLevel(level)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    borderRadius: '12px',
-                    border: isSelected ? '2px solid #111827' : '2px solid #e5e7eb',
-                    backgroundColor: isSelected ? '#f9f9f9' : '#f9fafb',
-                    color: isSelected ? '#ffffff' : '#374151',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    textAlign: 'left',
-                    transition: 'all 0.15s',
-                  }}
+                  className={`level-btn${isSelected ? ' level-btn--selected' : ''}`}
                 >
-                  <span style={{ fontWeight: '700', fontSize: '15px', minWidth: '60px' }}>{label}</span>
-                  <span style={{ fontSize: '14px', opacity: 0.85 }}>{desc}</span>
+                  <span className="level-btn-label">{label}</span>
+                  <span className="level-btn-desc">{desc}</span>
                   {verseProgress >= level && (
-                    <span style={{ marginLeft: 'auto', fontSize: '13px', color: isSelected ? '#86efac' : '#10b981', fontWeight: '600' }}>
-                      Completed
-                    </span>
+                    <span className="level-btn-completed">Completed</span>
                   )}
                 </button>
               );
@@ -146,30 +126,23 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
           </div>
 
           <button
-            className="btn-modern"
-            style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
+            className="btn-modern btn-dark"
             onClick={() => onStart(fetchedText, reference.trim(), selectedLevel)}
           >
             Start Level {selectedLevel} in {drillMode} mode
           </button>
 
           {drillMode === 'simple' && (
-            <button
-              className="btn-modern"
-              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
-              onClick={() => setDrillMode('overlay')}
-            >
+            <button className="btn-modern btn-muted" onClick={() => setDrillMode('overlay')}>
               Switch Mode
-            </button>)}
+            </button>
+          )}
 
           {drillMode === 'overlay' && (
-            <button
-              className="btn-modern"
-              style={{ marginTop: '10px', width: '100%', backgroundColor: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb' }}
-              onClick={() => setDrillMode('simple')}
-            >
+            <button className="btn-modern btn-muted" onClick={() => setDrillMode('simple')}>
               Switch Mode
-            </button>)}
+            </button>
+          )}
         </>
       )}
     </div>
