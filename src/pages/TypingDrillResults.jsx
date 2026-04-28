@@ -10,19 +10,49 @@ function normWord(w) {
 function buildDiff(userInput, target) {
   const targetWords = target.trim().split(/\s+/).filter(Boolean);
   const typedWords = userInput.trim().split(/\s+/).filter(Boolean);
-  return targetWords.map((word, i) => {
-    const typed = typedWords[i];
-    if (!typed) return { word, typed: null, status: 'missing' };
-    if (normWord(typed) === normWord(word)) return { word, typed, status: 'correct' };
-    return { word, typed, status: 'wrong' };
-  });
+  const n = targetWords.length;
+  const m = typedWords.length;
+
+  // Build LCS table
+  const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      if (normWord(targetWords[i - 1]) === normWord(typedWords[j - 1])) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+
+  // Backtrack to build aligned result.
+  // When both a target word and a typed word are unmatched at the same position,
+  // treat it as a substitution (wrong) rather than separate missing + extra.
+  const result = [];
+  let i = n, j = m;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && normWord(targetWords[i - 1]) === normWord(typedWords[j - 1])) {
+      result.unshift({ word: targetWords[i - 1], typed: typedWords[j - 1], status: 'correct' });
+      i--; j--;
+    } else if (i > 0 && j > 0 && dp[i - 1][j] === dp[i][j - 1]) {
+      // Neither direction advances the LCS — treat as a substitution (wrong)
+      result.unshift({ word: targetWords[i - 1], typed: typedWords[j - 1], status: 'wrong' });
+      i--; j--;
+    } else if (j > 0 && (i === 0 || dp[i][j - 1] > dp[i - 1][j])) {
+      j--; // extra typed word with no target match
+    } else {
+      result.unshift({ word: targetWords[i - 1], typed: null, status: 'missing' });
+      i--;
+    }
+  }
+  return result;
 }
 
 function WordDiff({ userInput, target }) {
   const diff = buildDiff(userInput, target);
+  const accountedForCount = diff.filter(d => d.status === 'correct' || d.status === 'wrong').length;
   const typedWordCount = userInput.trim().split(/\s+/).filter(Boolean).length;
-  const targetWordCount = target.trim().split(/\s+/).filter(Boolean).length;
-  const extraCount = Math.max(0, typedWordCount - targetWordCount);
+  const extraCount = Math.max(0, typedWordCount - accountedForCount);
 
   return (
     <div className="diff-container">
@@ -93,6 +123,13 @@ function TypingDrillResults({ userInput, time, accuracy, currentPassage, level, 
             {correctCount}<span style={{ fontSize: '14px', fontWeight: '500', color: '#9ca3af' }}>/{totalCount}</span>
           </p>
         </div>
+      </div>
+
+      <div style={{ backgroundColor: '#f9fafb', padding: '16px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left' }}>
+        <p className="label-text" style={{ marginBottom: '8px' }}>Your input</p>
+        <p style={{ margin: 0, color: '#374151', fontSize: '15px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+          {userInput.trim() || <em style={{ color: '#9ca3af' }}>Nothing typed</em>}
+        </p>
       </div>
 
       <WordDiff userInput={userInput} target={currentPassage} />

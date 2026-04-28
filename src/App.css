@@ -265,6 +265,18 @@ body {
   color: #ffffff;
 }
 
+/* White card */
+.feature-purple {
+  background: #ffffff;
+  color: #1a1209;
+  border: 1px solid #e8ddd4;
+}
+
+.feature-purple h3,
+.feature-purple p {
+  color: #1a1209;
+}
+
 /* Cream / off-white card */
 .feature-yellow {
   background: #f5ede0;

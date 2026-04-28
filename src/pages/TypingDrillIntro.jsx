@@ -9,6 +9,11 @@ function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
 }
 
+function normalizeReference(ref) {
+  // Capitalize first letter of each word so "genesis 1:1" and "Genesis 1:1" are treated identically
+  return ref.trim().replace(/\b[a-zA-Z]/g, c => c.toUpperCase());
+}
+
 function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
@@ -30,7 +35,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     try {
       const text = await fetchPassage(parsed, translation);
       setFetchedText(text);
-      loadProgress(reference.trim());
+      loadProgress(normalizeReference(reference));
     } catch {
       setError('Passage not found. Check the reference and try again.');
     } finally {
@@ -127,7 +132,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
 
           <button
             className="btn-modern btn-dark"
-            onClick={() => onStart(fetchedText, reference.trim(), selectedLevel)}
+            onClick={() => onStart(fetchedText, normalizeReference(reference), selectedLevel)}
           >
             Start Level {selectedLevel} in {drillMode} mode
           </button>
