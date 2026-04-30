@@ -58,12 +58,27 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
 
 function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript) {
   const audioSupported = SpeechRecognition.browserSupportsSpeechRecognition();
-  const isMac = /Mac/i.test(navigator.userAgent) && !/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const [speechFailed, setSpeechFailed] = useState(false);
 
   // Stop any ongoing listening session when the component first loads
   useEffect(() => {
     SpeechRecognition.stopListening();
   }, []);
+
+  // Detect when the browser has the API but it fails at runtime
+  useEffect(() => {
+    if (!audioSupported) return;
+    const recognition = SpeechRecognition.getRecognition();
+    if (!recognition) return;
+    const handleError = (event) => {
+      if (['network', 'service-not-allowed', 'not-allowed', 'audio-capture'].includes(event.error)) {
+        setSpeechFailed(true);
+        SpeechRecognition.stopListening();
+      }
+    };
+    recognition.addEventListener('error', handleError);
+    return () => recognition.removeEventListener('error', handleError);
+  }, [audioSupported]);
 
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
@@ -116,7 +131,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
         />
-        {(audioSupported && !isMac) ?
+        {(audioSupported && !speechFailed) ?
           <div className="modern-card">
             <div className="drill-audio-input">
               {!listening &&
@@ -128,7 +143,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
               <p>{listening ? "Press to stop listening" : "Press to start listening"}</p>
             </div>
           </div>
-          : <WarningPopup message={"Speech recognition not suported on this browser"} />}
+          : <WarningPopup message={"Speech recognition is not supported in this browser. Try Chrome or Edge."} />}
       </div>
     </div>);
 }
