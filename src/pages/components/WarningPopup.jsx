@@ -1,10 +1,9 @@
 import React from 'react';
-import './App.css'
+import '../../App.css'
 
 function WarningPopup(params){
-    return <div style={modern-card}>
+    return <div className="modern-card">
             {params.message}
-            <button style={btn-modern}></button>
         </div>
 }
 
