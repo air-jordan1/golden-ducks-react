@@ -220,7 +220,7 @@ function TypingDrill() {
     setState(STATES.RESULTS);
 
     const user = auth.currentUser;
-    if (user && completed) {
+    if (user) {
       try {
         const existing = await getDocs(
           query(collection(db, "drillResults"),
@@ -228,34 +228,40 @@ function TypingDrill() {
             where("reference", "==", currentReference))
         );
 
-        const record = {
-          userId: user.uid,
-          passage: currentPassage,
-          reference: currentReference,
-          timeTaken: time,
-          accuracy: acc,
-          level: currentLevel,
-          translation,
-          completedAt: new Date(),
-        };
+        const existingBest = !existing.empty ? (existing.docs[0].data().accuracy ?? 0) : -1;
 
-        if (!existing.empty) {
-          await setDoc(doc(db, "drillResults", existing.docs[0].id), record);
-        } else {
-          await addDoc(collection(db, "drillResults"), record);
+        if (acc > existingBest) {
+          const record = {
+            userId: user.uid,
+            passage: currentPassage,
+            reference: currentReference,
+            timeTaken: time,
+            accuracy: acc,
+            level: currentLevel,
+            translation,
+            completedAt: new Date(),
+          };
+
+          if (!existing.empty) {
+            await setDoc(doc(db, "drillResults", existing.docs[0].id), record);
+          } else {
+            await addDoc(collection(db, "drillResults"), record);
+          }
         }
 
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        const verseProgress = userSnap.exists() ? (userSnap.data().verseProgress || {}) : {};
-        const key = getProgressKey(currentReference);
+        if (completed) {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+          const verseProgress = userSnap.exists() ? (userSnap.data().verseProgress || {}) : {};
+          const key = getProgressKey(currentReference);
 
-        if (currentLevel > (verseProgress[key] || 0)) {
-          await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
-        }
+          if (currentLevel > (verseProgress[key] || 0)) {
+            await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
+          }
 
-        if (currentLevel === maxLevel && acc >= COMPLETION_THRESHOLD) {
-          await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
+          if (currentLevel === maxLevel && acc === 100) {
+            await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
+          }
         }
       } catch (err) {
         console.error("Firestore write failed:", err);

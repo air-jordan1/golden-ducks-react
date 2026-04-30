@@ -30,17 +30,19 @@ function Account() {
           where("userId", "==", user.uid)
         );
         const snap = await getDocs(q);
-        const allResults = snap.docs
-          .map(d => ({ id: d.id, ...d.data() }))
-          .filter(r => r.accuracy >= 90)
-          .sort((a, b) => b.completedAt?.toDate() - a.completedAt?.toDate());
+        const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        const seen = new Set();
-        const results = allResults.filter(r => {
-          if (!r.reference || seen.has(r.reference)) return false;
-          seen.add(r.reference);
-          return true;
+        const bestByRef = {};
+        all.forEach(r => {
+          if (!r.reference) return;
+          const existing = bestByRef[r.reference];
+          if (!existing || r.accuracy > existing.accuracy) {
+            bestByRef[r.reference] = r;
+          }
         });
+
+        const results = Object.values(bestByRef)
+          .sort((a, b) => b.completedAt?.toDate() - a.completedAt?.toDate());
         setDrillResults(results);
       } catch (err) {
         console.error("Error loading account data:", err);
@@ -142,23 +144,31 @@ function Account() {
 
             {drillResults.length === 0 ? (
               <div className="empty-state">
-                <p className="empty-state-title">No drills completed yet</p>
-                <p className="empty-state-subtitle">Complete a drill at 90%+ accuracy<br/>to see your history here.</p>
+                <p className="empty-state-title">No drills yet</p>
+                <p className="empty-state-subtitle">Your attempts will appear here.</p>
                 <button className="empty-state-btn" onClick={() => navigate('/typing-drill')}>
                   Start your first drill
                 </button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {drillResults.map(result => (
-                  <div key={result.id} className="drill-result-card">
-                    <div>
-                      <p className="drill-result-ref">{result.reference || '—'}</p>
-                      <p className="drill-result-date">{result.completedAt?.toDate().toLocaleDateString()}</p>
+                {drillResults.map(result => {
+                  const acc = result.accuracy ?? 0;
+                  const accColor = acc >= 90 ? '#10b981' : acc >= 70 ? '#f59e0b' : '#ef4444';
+                  return (
+                    <div key={result.id} className="drill-result-card">
+                      <div>
+                        <p className="drill-result-ref">{result.reference || '—'}</p>
+                        <p className="drill-result-date">
+                          {result.completedAt?.toDate().toLocaleDateString()} &middot; Level {result.level ?? 1}{result.timeTaken ? ` · ${result.timeTaken}s` : ''}
+                        </p>
+                      </div>
+                      <span className="drill-result-badge" style={{ background: accColor }}>
+                        {acc}%
+                      </span>
                     </div>
-                    <span className="drill-result-badge">Level {result.level ?? 1}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
