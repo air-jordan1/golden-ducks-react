@@ -96,28 +96,34 @@ function normalize(text) {
   return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
 }
 
-// Calculate Accuracy using a simple word-by-word comparison after normalization. Returns a percentage.
-function calcAccuracyDefault(typed, target) {
-  const targetWords = normalize(target).split(/\s+/).filter(Boolean);
-  const typedWords = normalize(typed).split(/\s+/).filter(Boolean);
-  if (!targetWords.length) return 0;
-  let correct = 0;
-  for (let i = 0; i < targetWords.length; i++) {
-    if (typedWords[i] === targetWords[i]) correct++;
+function lcsAccuracy(targetWords, typedWords) {
+  const n = targetWords.length;
+  const m = typedWords.length;
+  if (!n) return 0;
+  const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      dp[i][j] = targetWords[i - 1] === typedWords[j - 1]
+        ? dp[i - 1][j - 1] + 1
+        : Math.max(dp[i - 1][j], dp[i][j - 1]);
+    }
   }
-  return Math.round((correct / targetWords.length) * 100);
+  return Math.round((dp[n][m] / n) * 100);
 }
 
-// Calculate Accuracy for the overlay method.
+function calcAccuracyDefault(typed, target) {
+  return lcsAccuracy(
+    normalize(target).split(/\s+/).filter(Boolean),
+    normalize(typed).split(/\s+/).filter(Boolean)
+  );
+}
+
 function calcAccuracyOverlay(typed, target) {
-  const targetWords = target.split(/\s+/).filter(Boolean);
-  const typedWords = typed.split(/\s+/).filter(Boolean);
-  if (!targetWords.length) return 0;
-  let correct = 0;
-  for (let i = 0; i < targetWords.length; i++) {
-    if (typedWords[i] === targetWords[i]) correct++;
-  }
-  return Math.round((correct / targetWords.length) * 100);
+  const normW = w => w.toLowerCase().replace(/[^\w]/g, '');
+  return lcsAccuracy(
+    target.split(/\s+/).filter(Boolean).map(normW),
+    typed.split(/\s+/).filter(Boolean).map(normW)
+  );
 }
 
 // Converts a string like "John 3:16" to a safe string like "john_3_16" for 
