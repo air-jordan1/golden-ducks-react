@@ -71,7 +71,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
     const recognition = SpeechRecognition.getRecognition();
     if (!recognition) return;
     const handleError = (event) => {
-      if (['network', 'service-not-allowed', 'not-allowed', 'audio-capture'].includes(event.error)) {
+      if (['not-allowed', 'audio-capture'].includes(event.error)) {
         setSpeechFailed(true);
         SpeechRecognition.stopListening();
       }

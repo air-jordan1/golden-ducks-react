@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -14,14 +14,18 @@ function normalizeReference(ref) {
   return ref.trim().replace(/\b[a-zA-Z]/g, c => c.toUpperCase());
 }
 
-function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode }) {
-  const [reference, setReference] = useState('');
-  const [fetchedText, setFetchedText] = useState('');
+function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode, initialReference, initialPassage, initialLevel }) {
+  const [reference, setReference] = useState(initialReference || '');
+  const [fetchedText, setFetchedText] = useState(initialPassage || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(initialLevel || 1);
   const [verseProgress, setVerseProgress] = useState(0);
   const [progressLoading, setProgressLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialReference) loadProgress(normalizeReference(initialReference));
+  }, []);
 
   const handleLookup = async () => {
     const parsed = parseReference(reference);

@@ -195,6 +195,7 @@ function TypingDrill() {
   }
 
   async function handleSubmit() {
+    SpeechRecognition.stopListening();
     setIsRunning(false);
     const val = inputRef.current.value;
     let acc;
@@ -287,12 +288,15 @@ function TypingDrill() {
         <HeaderArea />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           {state === STATES.INTRO && (
-            <TypingDrillIntro 
-              onStart={handleStart} 
-              translation={translation} 
+            <TypingDrillIntro
+              onStart={handleStart}
+              translation={translation}
               setTranslation={setTranslation}
               setDrillMode={setDrillMode}
-              drillMode={drillMode} 
+              drillMode={drillMode}
+              initialReference={currentReference}
+              initialPassage={currentPassage}
+              initialLevel={currentLevel}
             />
           )}
           {state === STATES.RUNNING && (
