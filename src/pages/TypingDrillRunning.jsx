@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import '../App.css';
+import WarningPopup from './components/WarningPopup';
 import VoiceInputTest from './AudioTest.jsx';
 import SpeechRecognition from 'react-speech-recognition';
 import { maxLevel, levelDescriptions } from './components/constants.js';
@@ -58,9 +59,6 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
 function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript) {
   const audioSupported = SpeechRecognition.browserSupportsSpeechRecognition();
 
-  if (!audioSupported) {
-    alert("Your browser doesn't support speech recognition.");
-  }
   // Stop any ongoing listening session when the component first loads
   useEffect(() => {
     SpeechRecognition.stopListening();
@@ -87,7 +85,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
       resetTranscript(); // Clear the transcript after appending to avoid duplicates
     }
   }, [finalTranscript, resetTranscript]);
-  
+
   const startListening = useCallback(() => {
     console.log('Starting to listen...');
     SpeechRecognition.startListening({ continuous: true, interimResults: true });
@@ -117,17 +115,19 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
         />
-        {audioSupported &&
-          <div className="drill-audio-input">
-            {!listening &&
-              <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
-            }
-            {listening &&
-              <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
-            }
-            <p>{listening ? "Listening" : "Paused"}</p>
+        {audioSupported ?
+          <div className="modern-card">
+            <div className="drill-audio-input">
+              {!listening &&
+                <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
+              }
+              {listening &&
+                <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
+              }
+              <p>{listening ? "Press to stop listening" : "Press to start listening"}</p>
+            </div>
           </div>
-        }
+          : <WarningPopup message={"Speech recognition not suported on this browser"} />}
       </div>
     </div>);
 }
