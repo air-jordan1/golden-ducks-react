@@ -85,7 +85,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
       resetTranscript(); // Clear the transcript after appending to avoid duplicates
     }
   }, [finalTranscript, resetTranscript]);
-  
+
   const startListening = useCallback(() => {
     console.log('Starting to listen...');
     SpeechRecognition.startListening({ continuous: true, interimResults: true });
@@ -116,16 +116,18 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
           onChange={(e) => setUserInput(e.target.value)}
         />
         {audioSupported ?
-          <div className="drill-audio-input">
-            {!listening &&
-              <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
-            }
-            {listening &&
-              <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
-            }
-            <p>{listening ? "Listening" : "Paused"}</p>
+          <div className="modern-card">
+            <div className="drill-audio-input">
+              {!listening &&
+                <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
+              }
+              {listening &&
+                <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
+              }
+              <p>{listening ? "Press to stop listening" : "Press to start listening"}</p>
+            </div>
           </div>
-        : <WarningPopup message={"Speech recognition not suported on this browser"}/> }
+          : <WarningPopup message={"Speech recognition not suported on this browser"} />}
       </div>
     </div>);
 }
