@@ -58,6 +58,7 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
 
 function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript) {
   const audioSupported = SpeechRecognition.browserSupportsSpeechRecognition();
+  const isMac = /Mac/i.test(navigator.userAgent) && !/iPad|iPhone|iPod/.test(navigator.userAgent);
 
   // Stop any ongoing listening session when the component first loads
   useEffect(() => {
@@ -115,7 +116,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
         />
-        {audioSupported ?
+        {(audioSupported && !isMac) ?
           <div className="modern-card">
             <div className="drill-audio-input">
               {!listening &&
