@@ -17,7 +17,9 @@ export const TRANSLATIONS = {
   KJV: 'KJV — King James Version',
   NIV: 'NIV - New International Version',
   NLT: 'NLT - New Living Translation',
-  JND: 'JND - J. N. Darby Translation'
+  JND: 'JND - French J. N. Darby Translation',
+  ELO: 'ELO - German Unrevised Elberfelder Translation',
+  VBL: 'VBL - Spanish Free Translation'
 };
 export const TRANSLATIONS_CONCISE = {
   ASV: 'ASV',
@@ -25,7 +27,9 @@ export const TRANSLATIONS_CONCISE = {
   KJV: 'KJV',
   NIV: 'NIV',
   NLT: 'NLT',
-  JND: 'JND'
+  JND: 'JND',
+  ELO: 'ELO',
+  VBL: 'VBL',
 };
 
 export default maxLevel;
