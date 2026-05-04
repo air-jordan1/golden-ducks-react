@@ -4,15 +4,7 @@ import { collection, doc, getDoc, getDocs, getPersistentCacheIndexManager, query
 import { getPreferredTranslation, setPreferredTranslation } from '../User.js'
 import { getTranslationId } from '../Passage.js';
 import "../App.css";
-
-// holds translation options
-const TRANSLATIONS = {
-  ASV: 'ASV — American Standard Version',
-  CSB: 'CSB - Christian Standard Bible',
-  KJV: 'KJV — King James Version',
-  NIV: 'NIV - New International Version',
-  NLT: 'NLT - New Living Translation'
-};
+import { TRANSLATIONS } from './components/constants.js';
 
 /**
  * Settings() React component

@@ -17,6 +17,7 @@ export const TRANSLATIONS = {
   KJV: 'KJV — King James Version',
   NIV: 'NIV - New International Version',
   NLT: 'NLT - New Living Translation',
+  JND: 'JND - J. N. Darby Translation'
 };
 export const TRANSLATIONS_CONCISE = {
   ASV: 'ASV',
@@ -24,6 +25,7 @@ export const TRANSLATIONS_CONCISE = {
   KJV: 'KJV',
   NIV: 'NIV',
   NLT: 'NLT',
+  JND: 'JND'
 };
 
 export default maxLevel;
