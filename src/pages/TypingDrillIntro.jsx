@@ -23,6 +23,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
   const [verseProgress, setVerseProgress] = useState(0);
   const [progressLoading, setProgressLoading] = useState(false);
 
+  // Checks progress on page load
   useEffect(() => {
     if (initialReference) loadProgress(normalizeReference(initialReference));
   }, []);
@@ -71,7 +72,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
         name="test"
         value={translation}
         className="select"
-        onChange={e => { handleLookup(); setTranslation(e.target.value); }}
+        onChange={e => { setTranslation(e.target.value); handleLookup(); }}
       >
         {Object.entries(TRANSLATIONS_CONCISE).map(([val, label]) => (
           <option key={val} value={val}>{label}</option>
