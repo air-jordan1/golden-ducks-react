@@ -12,9 +12,9 @@ export const levelDescriptions = [
   { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
 ];
 export const TRANSLATIONS = {
-  ASV: 'ASV — American Standard Version',
+  ASV: 'ASV - American Standard Version',
   CSB: 'CSB - Christian Standard Bible',
-  KJV: 'KJV — King James Version',
+  KJV: 'KJV - King James Version',
   NIV: 'NIV - New International Version',
   NLT: 'NLT - New Living Translation',
   JND: 'JND - French J. N. Darby Translation',
