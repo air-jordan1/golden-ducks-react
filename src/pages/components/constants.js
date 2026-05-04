@@ -19,7 +19,8 @@ export const TRANSLATIONS = {
   NLT: 'NLT - New Living Translation',
   JND: 'JND - French J. N. Darby Translation',
   ELO: 'ELO - German Unrevised Elberfelder Translation',
-  VBL: 'VBL - Spanish Free Translation'
+  VBL: 'VBL - Spanish Free Translation',
+  BLT: 'BLT - Portuguese Free Translation',
 };
 export const TRANSLATIONS_CONCISE = {
   ASV: 'ASV',
@@ -30,6 +31,7 @@ export const TRANSLATIONS_CONCISE = {
   JND: 'JND',
   ELO: 'ELO',
   VBL: 'VBL',
+  BLT: 'BLT',
 };
 
 export default maxLevel;
