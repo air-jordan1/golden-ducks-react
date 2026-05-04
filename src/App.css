@@ -1191,6 +1191,15 @@ a {
   font-family: inherit;
 }
 
+.copyright {
+  margin: 0 0 8px 0;
+  font-size: 9px;
+  font-weight: 500;
+  color: #b8a898;
+  letter-spacing: 1px;
+  max-width: 90ch;
+}
+
 /* ============================================================
    ACCOUNT PAGE
    ============================================================ */

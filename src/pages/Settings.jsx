@@ -70,12 +70,15 @@ function Settings() {
             <option key={val} value={val}>{label}</option>
           ))}
         </select>
-
         <p className="label-text">Preview — Romans 5:8</p>
         <div className="verse-preview">
           <p>{previewText}</p>
         </div>
       </div>
+      <p></p>
+      <p className="copyright">Christian Standard Bible® and CSB® are federally registered trademarks of Holman Bible Publishers. All rights reserved. bhpublishinggroup.com</p>
+      <p className="copyright">Holy Bible, New Living Translation, Copyright © 2014, Tyndale House Publishers. All rights reserved. tyndale.com</p>
+      <p className="copyright">The Holy Bible, New International Version® NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by Permission of Biblica, Inc.® All rights reserved worldwide. To learn more, visit http://biblica.com and http://facebook.com/Biblica.</p>
     </div>
   );
 }
