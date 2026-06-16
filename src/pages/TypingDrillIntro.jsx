@@ -9,7 +9,7 @@ function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
 }
 
-function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode }) {
+function TypingDrillIntro({ onStart: param.onStart, translation: param.translation, setTranslation: param.setTranslation, setDrillMode, drillMode }) {
   const [reference, setReference] = useState('');
   const [fetchedText, setFetchedText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     setFetchedText('');
     setLoading(true);
     try {
-      const text = await fetchPassage(parsed, translation);
+      const text = await fetchPassage(parsed, param.translation);
       setFetchedText(text);
       loadProgress(reference.trim());
     } catch {
@@ -60,9 +60,9 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     return (
       <select
         name="test"
-        value={translation}
+        value={param.translation}
         className="select"
-        onChange={e => { handleLookup(); setTranslation(e.target.value); }}
+        onChange={e => { handleLookup(); param.setTranslation(e.target.value); }}
       >
         {Object.entries(TRANSLATIONS_CONCISE).map(([val, label]) => (
           <option key={val} value={val}>{label}</option>
@@ -127,7 +127,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
 
           <button
             className="btn-modern btn-dark"
-            onClick={() => onStart(fetchedText, reference.trim(), selectedLevel)}
+            onClick={() => param.onStart(fetchedText, reference.trim(), selectedLevel)}
           >
             Start Level {selectedLevel} in {drillMode} mode
           </button>

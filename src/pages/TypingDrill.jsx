@@ -322,6 +322,7 @@ function TypingDrill() {
               onRestart={handleRestart}
               onNextLevel={handleNextLevel}
               onRetry={handleRetry}
+              normalize={normalize}
             />
           )}
         </div>
