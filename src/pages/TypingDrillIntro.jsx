@@ -70,7 +70,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     return (
       <select
         name="test"
-        value={param.translation}
+        value={translation}
         className="select"
         onChange={e => { setTranslation(e.target.value); handleLookup(); }}
       >
