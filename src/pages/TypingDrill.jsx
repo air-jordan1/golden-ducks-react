@@ -7,117 +7,46 @@ import TypingDrillRunning from './TypingDrillRunning';
 import TypingDrillResults from './TypingDrillResults';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { maxLevel, STATES, COMPLETION_THRESHOLD } from './components/constants.js';
-
-// Parse the Scripture reference
-function parseReference(ref) {
-  const t = ref.trim();
-  const bookSlug = (b) => b.toLowerCase().replace(/\s+/g, '-');
-
-  // Verse range: "John 1:1-7"
-  const rangeMatch = t.match(/^(.+?)\s+(\d+):(\d+)-(\d+)$/);
-  if (rangeMatch) return {
-    type: 'range',
-    book: bookSlug(rangeMatch[1]),
-    chapter: rangeMatch[2],
-    start: parseInt(rangeMatch[3]),
-    end: parseInt(rangeMatch[4]),
-  };
-
-  // Single verse: "John 3:16"
-  const verseMatch = t.match(/^(.+?)\s+(\d+):(\d+)$/);
-  if (verseMatch) return {
-    type: 'verse',
-    book: bookSlug(verseMatch[1]),
-    chapter: verseMatch[2],
-    verse: verseMatch[3],
-  };
-
-  // Full chapter: "Proverbs 2"
-  const chapterMatch = t.match(/^(.+?)\s+(\d+)$/);
-  if (chapterMatch) return {
-    type: 'chapter',
-    book: bookSlug(chapterMatch[1]),
-    chapter: chapterMatch[2],
-  };
-
-  return null;
-}
-
-function parsedRefToID(parsed) {
-  let id = '';
-  const book = map.get(parsed.book);
-  const chapter = parsed.chapter;
-
-  if (parsed.type === 'range') {
-    id = `${book}.${chapter}.${parsed.start}-${book}.${chapter}.${parsed.end}`;
-  }
-  if (parsed.type === 'verse') {
-    id = `${book}.${chapter}.${parsed.verse}`;
-  }
-  if (parsed.type === 'chapter') {
-    id = `${book}.${chapter}`;
-  }
-
-  return id;
-}
-
-// Fetch the passage from the parsed reference
-async function fetchPassage(parsed, translation) {
-  // const base = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-${translation}/books/${parsed.book}/chapters/${parsed.chapter}`;
-
-  const bibleId = await getTranslationId(translation);
-  const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
-  const modifiers = `?content-type=text&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false`
-  const id = parsedRefToID(parsed);
-
-  if (parsed.type === 'verse') {
-    const res = await fetch(`${base}/verses/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
-    if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '').trim();
-  }
-
-  if (parsed.type === 'range') {
-    const res = await fetch(`${base}/passages/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
-    if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '').trim();
-  }
-
-  if (parsed.type === 'chapter') {
-    const res = await fetch(`${base}/chapters/${id}${modifiers}`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
-    if (!res.ok) throw new Error();
-    return (await res.json()).data.content.replace('¶', '').trim();
-  }
-
-  throw new Error();
-}
+import { parseReference, parsedRefToID, fetchPassage } from '../Passage';
 
 // Normalize text to a common format for comparison (lowercase, remove punctuation, trim)
-function normalize(text) {
-  return text.toLowerCase().replace(/[^\w\s]/g, '').trim();
+function norm(text) {
+  return text
+    .toLowerCase()
+    .normalize('NFD')                   // Decompose accented characters (built in normalize function)
+    .replace(/[\u0300-\u036f]/g, '')    // Remove diacritical marks
+    .replace(/[^\w\s]/g, '')
+    .trim();
 }
 
-// Calculate Accuracy using a simple word-by-word comparison after normalization. Returns a percentage.
+// Longest Common Subsequence (LCS) accuracy
+function lcsAccuracy(targetWords, typedWords) {
+  const n = targetWords.length;
+  const m = typedWords.length;
+  if (!n) return 0;
+  const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      dp[i][j] = targetWords[i - 1] === typedWords[j - 1]
+        ? dp[i - 1][j - 1] + 1
+        : Math.max(dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  return Math.round((dp[n][m] / n) * 100);
+}
+
 function calcAccuracyDefault(typed, target) {
-  const targetWords = normalize(target).split(/\s+/).filter(Boolean);
-  const typedWords = normalize(typed).split(/\s+/).filter(Boolean);
-  if (!targetWords.length) return 0;
-  let correct = 0;
-  for (let i = 0; i < targetWords.length; i++) {
-    if (typedWords[i] === targetWords[i]) correct++;
-  }
-  return Math.round((correct / targetWords.length) * 100);
+  return lcsAccuracy(
+    norm(target).split(/\s+/).filter(Boolean),
+    norm(typed).split(/\s+/).filter(Boolean)
+  );
 }
 
-// Calculate Accuracy for the overlay method.
 function calcAccuracyOverlay(typed, target) {
-  const targetWords = target.split(/\s+/).filter(Boolean);
-  const typedWords = typed.split(/\s+/).filter(Boolean);
-  if (!targetWords.length) return 0;
-  let correct = 0;
-  for (let i = 0; i < targetWords.length; i++) {
-    if (typedWords[i] === targetWords[i]) correct++;
-  }
-  return Math.round((correct / targetWords.length) * 100);
+  return lcsAccuracy(
+    target.split(/\s+/).filter(Boolean),
+    typed.split(/\s+/).filter(Boolean)
+  );
 }
 
 // Converts a string like "John 3:16" to a safe string like "john_3_16" for 
@@ -195,6 +124,7 @@ function TypingDrill() {
   }
 
   async function handleSubmit() {
+    SpeechRecognition.stopListening();
     setIsRunning(false);
     const val = inputRef.current.value;
     let acc;
@@ -213,7 +143,7 @@ function TypingDrill() {
     setState(STATES.RESULTS);
 
     const user = auth.currentUser;
-    if (user && completed) {
+    if (user) {
       try {
         const existing = await getDocs(
           query(collection(db, "drillResults"),
@@ -221,34 +151,40 @@ function TypingDrill() {
             where("reference", "==", currentReference))
         );
 
-        const record = {
-          userId: user.uid,
-          passage: currentPassage,
-          reference: currentReference,
-          timeTaken: time,
-          accuracy: acc,
-          level: currentLevel,
-          translation,
-          completedAt: new Date(),
-        };
+        const existingBest = !existing.empty ? (existing.docs[0].data().accuracy ?? 0) : -1;
 
-        if (!existing.empty) {
-          await setDoc(doc(db, "drillResults", existing.docs[0].id), record);
-        } else {
-          await addDoc(collection(db, "drillResults"), record);
+        if (acc > existingBest) {
+          const record = {
+            userId: user.uid,
+            passage: currentPassage,
+            reference: currentReference,
+            timeTaken: time,
+            accuracy: acc,
+            level: currentLevel,
+            translation,
+            completedAt: new Date(),
+          };
+
+          if (!existing.empty) {
+            await setDoc(doc(db, "drillResults", existing.docs[0].id), record);
+          } else {
+            await addDoc(collection(db, "drillResults"), record);
+          }
         }
 
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        const verseProgress = userSnap.exists() ? (userSnap.data().verseProgress || {}) : {};
-        const key = getProgressKey(currentReference);
+        if (completed) {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+          const verseProgress = userSnap.exists() ? (userSnap.data().verseProgress || {}) : {};
+          const key = getProgressKey(currentReference);
 
-        if (currentLevel > (verseProgress[key] || 0)) {
-          await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
-        }
+          if (currentLevel > (verseProgress[key] || 0)) {
+            await updateDoc(userRef, { [`verseProgress.${key}`]: currentLevel });
+          }
 
-        if (currentLevel === maxLevel && acc >= COMPLETION_THRESHOLD) {
-          await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
+          if (currentLevel === maxLevel && acc === 100) {
+            await updateDoc(userRef, { memorizedVerses: arrayUnion(currentReference) });
+          }
         }
       } catch (err) {
         console.error("Firestore write failed:", err);
@@ -287,12 +223,15 @@ function TypingDrill() {
         <HeaderArea />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           {state === STATES.INTRO && (
-            <TypingDrillIntro 
-              onStart={handleStart} 
-              translation={translation} 
+            <TypingDrillIntro
+              onStart={handleStart}
+              translation={translation}
               setTranslation={setTranslation}
               setDrillMode={setDrillMode}
-              drillMode={drillMode} 
+              drillMode={drillMode}
+              initialReference={currentReference}
+              initialPassage={currentPassage}
+              initialLevel={currentLevel}
             />
           )}
           {state === STATES.RUNNING && (
@@ -322,7 +261,7 @@ function TypingDrill() {
               onRestart={handleRestart}
               onNextLevel={handleNextLevel}
               onRetry={handleRetry}
-              normalize={normalize}
+              normalize={norm}
             />
           )}
         </div>

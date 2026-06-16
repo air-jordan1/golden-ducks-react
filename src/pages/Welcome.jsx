@@ -6,8 +6,8 @@ function Welcome() {
     <div className="dashboard-page">
       {/* Hero */}
       <section className="dashboard-hero">
-        <h1 className="dashboard-greeting">What do you want to memorize?</h1>
-        <p className="dashboard-tagline">Pick a tool and start building your Scripture memory today.</p>
+        <h1 className="dashboard-greeting">What do you want to do?</h1>
+        <p className="dashboard-tagline">Pick a tool to help you memorize, view your progress, or manage your settings.</p>
       </section>
 
       {/* Dashboard Cards */}

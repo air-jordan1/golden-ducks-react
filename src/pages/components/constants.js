@@ -12,11 +12,15 @@ export const levelDescriptions = [
   { level: maxLevel, label: `Level ${maxLevel}`, desc: 'No verse shown — type from memory' },
 ];
 export const TRANSLATIONS = {
-  ASV: 'ASV — American Standard Version',
+  ASV: 'ASV - American Standard Version',
   CSB: 'CSB - Christian Standard Bible',
-  KJV: 'KJV — King James Version',
+  KJV: 'KJV - King James Version',
   NIV: 'NIV - New International Version',
   NLT: 'NLT - New Living Translation',
+  JND: 'JND - French J. N. Darby Translation',
+  ELO: 'ELO - German Unrevised Elberfelder Translation',
+  VBL: 'VBL - Spanish Free Translation',
+  BLT: 'BLT - Portuguese Free Translation',
 };
 export const TRANSLATIONS_CONCISE = {
   ASV: 'ASV',
@@ -24,6 +28,10 @@ export const TRANSLATIONS_CONCISE = {
   KJV: 'KJV',
   NIV: 'NIV',
   NLT: 'NLT',
+  JND: 'JND',
+  ELO: 'ELO',
+  VBL: 'VBL',
+  BLT: 'BLT',
 };
 
 export default maxLevel;

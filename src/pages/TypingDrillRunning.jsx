@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import '../App.css';
+import WarningPopup from './components/WarningPopup';
 import VoiceInputTest from './AudioTest.jsx';
 import SpeechRecognition from 'react-speech-recognition';
 import { maxLevel, levelDescriptions } from './components/constants.js';
@@ -57,14 +58,27 @@ function TypingDrillRunning(param) {
 
 function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript) {
   const audioSupported = SpeechRecognition.browserSupportsSpeechRecognition();
+  const [speechFailed, setSpeechFailed] = useState(false);
 
-  if (!audioSupported) {
-    alert("Your browser doesn't support speech recognition.");
-  }
   // Stop any ongoing listening session when the component first loads
   useEffect(() => {
     SpeechRecognition.stopListening();
   }, []);
+
+  // Detect when the browser has the API but it fails at runtime
+  useEffect(() => {
+    if (!audioSupported) return;
+    const recognition = SpeechRecognition.getRecognition();
+    if (!recognition) return;
+    const handleError = (event) => {
+      if (['not-allowed', 'audio-capture'].includes(event.error)) {
+        setSpeechFailed(true);
+        SpeechRecognition.stopListening();
+      }
+    };
+    recognition.addEventListener('error', handleError);
+    return () => recognition.removeEventListener('error', handleError);
+  }, [audioSupported]);
 
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
@@ -87,7 +101,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
       resetTranscript(); // Clear the transcript after appending to avoid duplicates
     }
   }, [finalTranscript, resetTranscript]);
-  
+
   const startListening = useCallback(() => {
     console.log('Starting to listen...');
     SpeechRecognition.startListening({ continuous: true, interimResults: true });
@@ -117,17 +131,19 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
         />
-        {audioSupported &&
-          <div className="drill-audio-input">
-            {!listening &&
-              <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
-            }
-            {listening &&
-              <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
-            }
-            <p>{listening ? "Listening" : "Paused"}</p>
+        {(audioSupported && !speechFailed) ?
+          <div className="modern-card">
+            <div className="drill-audio-input">
+              {!listening &&
+                <button className="audio-button" aria-label="Start listening" onClick={() => SpeechRecognition.startListening({ continuous: true, interimResults: true })}>▶</button>
+              }
+              {listening &&
+                <button className="audio-button" aria-label="Stop listening" onClick={SpeechRecognition.stopListening}>🔴</button>
+              }
+              <p>{listening ? "Press to stop listening" : "Press to start listening"}</p>
+            </div>
           </div>
-        }
+          : <WarningPopup message={"Speech recognition is not supported in this browser. Try Chrome or Edge."} />}
       </div>
     </div>);
 }

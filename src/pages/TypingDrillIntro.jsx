@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -9,14 +9,24 @@ function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
 }
 
-function TypingDrillIntro({ onStart: param.onStart, translation: param.translation, setTranslation: param.setTranslation, setDrillMode, drillMode }) {
-  const [reference, setReference] = useState('');
-  const [fetchedText, setFetchedText] = useState('');
+function normalizeReference(ref) {
+  // Capitalize first letter of each word so "genesis 1:1" and "Genesis 1:1" are treated identically
+  return ref.trim().replace(/\b[a-zA-Z]/g, c => c.toUpperCase());
+}
+
+function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, drillMode, initialReference, initialPassage, initialLevel }) {
+  const [reference, setReference] = useState(initialReference || '');
+  const [fetchedText, setFetchedText] = useState(initialPassage || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(initialLevel || 1);
   const [verseProgress, setVerseProgress] = useState(0);
   const [progressLoading, setProgressLoading] = useState(false);
+
+  // Checks progress on page load
+  useEffect(() => {
+    if (initialReference) loadProgress(normalizeReference(initialReference));
+  }, []);
 
   const handleLookup = async () => {
     const parsed = parseReference(reference);
@@ -30,7 +40,7 @@ function TypingDrillIntro({ onStart: param.onStart, translation: param.translati
     try {
       const text = await fetchPassage(parsed, param.translation);
       setFetchedText(text);
-      loadProgress(reference.trim());
+      loadProgress(normalizeReference(reference));
     } catch {
       setError('Passage not found. Check the reference and try again.');
     } finally {
@@ -62,7 +72,7 @@ function TypingDrillIntro({ onStart: param.onStart, translation: param.translati
         name="test"
         value={param.translation}
         className="select"
-        onChange={e => { handleLookup(); param.setTranslation(e.target.value); }}
+        onChange={e => { setTranslation(e.target.value); handleLookup(); }}
       >
         {Object.entries(TRANSLATIONS_CONCISE).map(([val, label]) => (
           <option key={val} value={val}>{label}</option>
@@ -127,7 +137,7 @@ function TypingDrillIntro({ onStart: param.onStart, translation: param.translati
 
           <button
             className="btn-modern btn-dark"
-            onClick={() => param.onStart(fetchedText, reference.trim(), selectedLevel)}
+            onClick={() => onStart(fetchedText, normalizeReference(reference), selectedLevel)}
           >
             Start Level {selectedLevel} in {drillMode} mode
           </button>
