@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import '../App.css';
 import HelpModal from '../components/HelpModal';
 import ReferenceQuizIntro from './ReferenceQuizIntro';
@@ -14,12 +14,13 @@ function ReferenceQuiz() {
   const [quizMode, setQuizMode] = useState('multiple-choice');
   const { profile } = useUser();
 
-  // set the translation based on profile
-  useEffect(() => {
-    if (profile?.preferredTranslation) {
-      setTranslation(profile.preferredTranslation);
-    }
-  }, [profile?.preferredTranslation]);
+  const [prevProfileTranslation, setPrevProfileTranslation] = useState(null);
+
+  // set the translation based on profile without triggering an effect cascading render
+  if (profile?.preferredTranslation && profile.preferredTranslation !== prevProfileTranslation) {
+    setPrevProfileTranslation(profile.preferredTranslation);
+    setTranslation(profile.preferredTranslation);
+  }
 
   function handleStart(selectedBook, selectedChapter, selectedMode) {
     setBook(selectedBook);

@@ -17,16 +17,21 @@ function TestRunning({ config, translation, onFinish, onCancel }) {
       try {
         const selectedRefs = [...config.pool].sort(() => Math.random() - 0.5).slice(0, config.count);
         
-        const dataPromises = selectedRefs.map(async (ref) => {
+        const rawData = [];
+        for (const ref of selectedRefs) {
           const parsed = parseReference(ref);
           let text = "Text unavailable";
           if (parsed) {
-            text = await fetchPassage(parsed, translation);
+            try {
+              text = await fetchPassage(parsed, translation);
+            } catch (err) {
+              console.error(`Error fetching passage for ${ref}:`, err);
+            }
           }
-          return { reference: ref, text };
-        });
-        
-        const rawData = await Promise.all(dataPromises);
+          rawData.push({ reference: ref, text });
+          // Add a small delay to respect API rate limits (API.Bible has a 5 req/s limit)
+          await new Promise(r => setTimeout(r, 250));
+        }
         
         const availableTypes = [];
         if (config.types.trueFalse) availableTypes.push('true-false');

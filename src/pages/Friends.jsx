@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, query, collection, where, getDocs, arrayRemove } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, query, collection, where, getDocs, arrayRemove } from 'firebase/firestore';
 import { useUser } from '../context/UserContext';
 import '../App.css';
 
@@ -12,48 +12,48 @@ function Friends() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchFriends() {
+      setLoading(true);
+      try {
+        const followingUids = profile.following || [];
+        if (followingUids.length === 0) {
+          setFriends([]);
+          setLoading(false);
+          return;
+        }
+
+        // Firestore 'in' queries are limited to 10 items, but fine for prototype
+        // To handle > 10, chunk the array
+        const chunks = [];
+        for (let i = 0; i < followingUids.length; i += 10) {
+          chunks.push(followingUids.slice(i, i + 10));
+        }
+
+        let allFriends = [];
+        for (const chunk of chunks) {
+          const q = query(collection(db, 'users'), where('__name__', 'in', chunk));
+          const snap = await getDocs(q);
+          snap.forEach(docSnap => {
+            allFriends.push({ id: docSnap.id, ...docSnap.data() });
+          });
+        }
+
+        // Add self to leaderboard
+        allFriends.push({ id: user.uid, ...profile, isMe: true });
+
+        // Sort by streak descending
+        allFriends.sort((a, b) => (b.currentStreak || 0) - (a.currentStreak || 0));
+        setFriends(allFriends);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     if (!profile) return;
     fetchFriends();
-  }, [profile]);
-
-  async function fetchFriends() {
-    setLoading(true);
-    try {
-      const followingUids = profile.following || [];
-      if (followingUids.length === 0) {
-        setFriends([]);
-        setLoading(false);
-        return;
-      }
-
-      // Firestore 'in' queries are limited to 10 items, but fine for prototype
-      // To handle > 10, chunk the array
-      const chunks = [];
-      for (let i = 0; i < followingUids.length; i += 10) {
-        chunks.push(followingUids.slice(i, i + 10));
-      }
-
-      let allFriends = [];
-      for (const chunk of chunks) {
-        const q = query(collection(db, 'users'), where('__name__', 'in', chunk));
-        const snap = await getDocs(q);
-        snap.forEach(docSnap => {
-          allFriends.push({ id: docSnap.id, ...docSnap.data() });
-        });
-      }
-
-      // Add self to leaderboard
-      allFriends.push({ id: user.uid, ...profile, isMe: true });
-
-      // Sort by streak descending
-      allFriends.sort((a, b) => (b.currentStreak || 0) - (a.currentStreak || 0));
-      setFriends(allFriends);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [profile, user.uid]);
 
   async function handleAddFriend(e) {
     e.preventDefault();

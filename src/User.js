@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+
 import { auth, db } from "./firebase";
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 async function getPreferredTranslation() {
     const user = auth.currentUser;

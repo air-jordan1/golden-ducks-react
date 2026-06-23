@@ -1,6 +1,6 @@
 import { db } from "./firebase";
 import { map } from './BookIDMap';
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 /**
  * Parses the user's chosen Scripture reference.
@@ -98,13 +98,6 @@ async function fetchPassage(parsed, translation) {
   throw new Error();
 }
 
-// Clean verse numbers like [1], [2], etc.
-function cleanVerseNumbers(text) {
-  return text
-  .replace(/\[[^\]]*\]/g, '') // Remove [1], [2], etc.
-  .replace('¶', '')
-  .replace(/\s+/g, ' ').trim(); // Clean up extra whitespace
-}
 
 /**
  * Gets the bibleId for the specified translation.

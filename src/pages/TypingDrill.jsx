@@ -9,7 +9,7 @@ import TypingDrillRunning from './TypingDrillRunning';
 import TypingDrillResults from './TypingDrillResults';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { maxLevel, STATES, COMPLETION_THRESHOLD } from './components/constants.js';
-import { parseReference, parsedRefToID, fetchPassage } from '../Passage';
+import { parseReference, fetchPassage } from '../Passage';
 import { norm, calcAccuracyDefault, calcAccuracyOverlay, getProgressKey, getMissedWords } from '../utils/textProcessing';
 import { useUser } from '../context/UserContext';
 import { calculateNextReview } from '../utils/srs';
@@ -44,6 +44,7 @@ function TypingDrill() {
       hasStartedList.current = true;
       startListDrill(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drillList, translation]);
 
   async function startListDrill(index) {

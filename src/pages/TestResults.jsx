@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import '../App.css';
 
 function TestResults({ results, onRetake }) {
@@ -20,7 +19,7 @@ function TestResults({ results, onRetake }) {
 
       <h3 style={{ fontSize: '20px', marginBottom: '24px' }}>Review your answers</h3>
 
-      {results.graded.map((q, i) => (
+      {results.graded.map((q) => (
         <div key={q.id} className="modern-card" style={{ marginBottom: '16px', textAlign: 'left', borderLeft: `8px solid ${q.isCorrect ? '#10b981' : '#ef4444'}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: '#6b5c4e', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase' }}>
             <span>{q.direction === 'Reference' ? 'Definition' : 'Term'}</span>

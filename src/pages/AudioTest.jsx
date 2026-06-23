@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import '../App.css';
-import { auth, db } from "../firebase";
+
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function VoiceInputTest() {

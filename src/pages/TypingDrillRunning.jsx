@@ -34,18 +34,18 @@ function blankOutWords(text, difficulty) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, currentReference, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
         <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
-          Level {param.level} — {levelDescriptions[param.level - 1].desc}
+          Level {level} — {levelDescriptions[level - 1].desc}
         </span>
         <span className="label-text" style={{ fontSize: '13px', backgroundColor: '#f3f4f6', padding: '4px 10px', borderRadius: '20px' }}>
-          Translation: {param.translation}
+          Translation: {translation}
         </span>
-        <span className="label-text">Time: {param.time}s</span>
+        <span className="label-text">Time: {time}s</span>
       </div>
 
       <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1209', marginBottom: '16px', textAlign: 'center' }}>
@@ -53,15 +53,15 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
       </h2>
 
       {/* Verse Reference + Input field */}
-      {drillMode === 'simple' && simpleInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript)}
-      {drillMode === 'overlay' && overlayInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode)}
+      {drillMode === 'simple' && <SimpleInputMode currentPassage={currentPassage} level={levelIdToName(level)} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} finalTranscript={finalTranscript} listening={listening} resetTranscript={resetTranscript} />}
+      {drillMode === 'overlay' && <OverlayInputMode currentPassage={currentPassage} level={levelIdToName(level)} inputRef={inputRef} handleKeyDown={handleKeyDown} handleSubmit={handleSubmit} />}
       <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>Submit Result</button>
       <button className="btn-modern" onClick={onBack} style={{ marginTop: '10px', width: '100%' }}>Back</button>
     </div>
   );
 }
 
-function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript) {
+function SimpleInputMode({ currentPassage, level, inputRef, handleKeyDown, handleSubmit, finalTranscript, listening, resetTranscript }) {
   const audioSupported = SpeechRecognition.browserSupportsSpeechRecognition();
   const [speechFailed, setSpeechFailed] = useState(false);
 
@@ -102,15 +102,12 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
     console.log('finalTranscript:', finalTranscript);
     if (finalTranscript && finalTranscript.trim() !== '') {
       console.log('Appending:', finalTranscript);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserInput(prev => prev + ' ' + finalTranscript);
       resetTranscript(); // Clear the transcript after appending to avoid duplicates
     }
   }, [finalTranscript, resetTranscript]);
 
-  const startListening = useCallback(() => {
-    console.log('Starting to listen...');
-    SpeechRecognition.startListening({ continuous: true, interimResults: true });
-  }, []);
 
   return (
     <div>
@@ -153,7 +150,7 @@ function simpleInputMode(currentPassage, level, inputRef, handleKeyDown, handleS
     </div>);
 }
 
-function overlayInputMode(currentPassage, level, inputRef, handleKeyDown, handleSubmit) {
+function OverlayInputMode({ currentPassage, level, inputRef, handleKeyDown, handleSubmit }) {
   const handleInputKey = useCallback((event) => {
     if (event.key === 'Enter') {
       event.preventDefault();

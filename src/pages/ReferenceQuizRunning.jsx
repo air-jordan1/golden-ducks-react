@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import '../App.css';
 import { getRandomVerse, generateDistractors, parseReference } from '../Passage';
 
@@ -18,11 +18,7 @@ function ReferenceQuizRunning({ translation, book, chapter, quizMode, onBack }) 
   const [userInput, setUserInput] = useState('');
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    loadNextQuestion();
-  }, []);
-
-  async function loadNextQuestion() {
+  const loadNextQuestion = useCallback(async () => {
     setLoading(true);
     setFeedback(null);
     setUserInput('');
@@ -50,7 +46,11 @@ function ReferenceQuizRunning({ translation, book, chapter, quizMode, onBack }) 
         if (inputRef.current) inputRef.current.focus();
       }, 100);
     }
-  }
+  }, [chapter, book, translation, quizMode]);
+
+  useEffect(() => {
+    loadNextQuestion();
+  }, [loadNextQuestion]);
 
   function handleMultipleChoiceGuess(selectedRef) {
     if (selectedRef === verseData.reference) {

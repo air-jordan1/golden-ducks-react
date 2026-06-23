@@ -3,7 +3,7 @@ import '../App.css';
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { parseReference, fetchPassage } from '../Passage';
-import { maxLevel, TRANSLATIONS_CONCISE, levelDescriptions } from './components/constants';
+import { TRANSLATIONS_CONCISE, levelDescriptions } from './components/constants';
 
 function getProgressKey(reference) {
   return reference.replace(/[\s:.]/g, '_');
@@ -26,6 +26,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
   // Checks progress on page load
   useEffect(() => {
     if (initialReference) loadProgress(normalizeReference(initialReference));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLookup = async () => {
@@ -38,7 +39,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     setFetchedText('');
     setLoading(true);
     try {
-      const text = await fetchPassage(parsed, param.translation);
+      const text = await fetchPassage(parsed, translation);
       setFetchedText(text);
       loadProgress(normalizeReference(reference));
     } catch {

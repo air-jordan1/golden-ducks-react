@@ -1,7 +1,7 @@
 import { addDoc, collection } from "firebase/firestore";
 import { db } from './firebase';
 
-async function getBibles() {
+export async function getBibles() {
     const response = await fetch('https://rest.api.bible/v1/bibles', {
         headers: {
             'api-key': import.meta.env.VITE_BIBLE_API_KEY
