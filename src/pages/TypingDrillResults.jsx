@@ -1,7 +1,5 @@
 import '../App.css';
-
-const maxLevel = 4;
-const COMPLETION_THRESHOLD = 90;
+import { maxLevel, COMPLETION_THRESHOLD } from './components/constants.js';
 
 function buildDiff(userInput, target, normalize) {
   const targetWords = target.trim().split(/\s+/).filter(Boolean);

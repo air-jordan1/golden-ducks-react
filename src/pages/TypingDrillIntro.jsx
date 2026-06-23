@@ -38,7 +38,7 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
     setFetchedText('');
     setLoading(true);
     try {
-      const text = await fetchPassage(parsed, translation);
+      const text = await fetchPassage(parsed, param.translation);
       setFetchedText(text);
       loadProgress(normalizeReference(reference));
     } catch {
