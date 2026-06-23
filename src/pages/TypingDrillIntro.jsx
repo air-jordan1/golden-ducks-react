@@ -105,6 +105,16 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
         <>
           <div className="verse-preview">
             <p>{fetchedText}</p>
+            <button 
+              className="btn-modern btn-xs" 
+              style={{marginTop: '12px'}}
+              onClick={() => {
+                const utterance = new SpeechSynthesisUtterance(fetchedText);
+                window.speechSynthesis.speak(utterance);
+              }}
+            >
+              🔊 Listen
+            </button>
           </div>
 
           {!progressLoading && (
@@ -135,24 +145,25 @@ function TypingDrillIntro({ onStart, translation, setTranslation, setDrillMode, 
             })}
           </div>
 
+          <div style={{display: 'flex', gap: '8px', marginBottom: '16px', width: '100%', maxWidth: '500px'}}>
+            <button 
+              className={`btn-modern ${drillMode === 'simple' ? 'btn-dark' : 'btn-muted'}`} 
+              style={{flex: 1, margin: 0}}
+              onClick={() => setDrillMode('simple')}
+            >Normal</button>
+            <button 
+              className={`btn-modern ${drillMode === 'overlay' ? 'btn-dark' : 'btn-muted'}`} 
+              style={{flex: 1, margin: 0}}
+              onClick={() => setDrillMode('overlay')}
+            >Overlay</button>
+          </div>
+
           <button
             className="btn-modern btn-dark"
             onClick={() => onStart(fetchedText, normalizeReference(reference), selectedLevel)}
           >
             Start Level {selectedLevel} in {drillMode} mode
           </button>
-
-          {drillMode === 'simple' && (
-            <button className="btn-modern btn-muted" onClick={() => setDrillMode('overlay')}>
-              Switch Mode
-            </button>
-          )}
-
-          {drillMode === 'overlay' && (
-            <button className="btn-modern btn-muted" onClick={() => setDrillMode('simple')}>
-              Switch Mode
-            </button>
-          )}
         </>
       )}
     </div>

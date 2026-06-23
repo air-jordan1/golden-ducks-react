@@ -1,25 +1,22 @@
 import { useEffect, useState } from 'react';
-import { auth, db } from "../firebase";
-import { collection, doc, getDoc, getDocs, getPersistentCacheIndexManager, query, updateDoc, where } from "firebase/firestore";
-import { getPreferredTranslation, setPreferredTranslation } from '../User.js'
 import { getTranslationId } from '../Passage.js';
 import "../App.css";
 import { TRANSLATIONS } from './components/constants.js';
+import { useUser } from '../context/UserContext';
+import HelpModal from '../components/HelpModal';
 
-/**
- * Settings() React component
- * @returns 
- */
 function Settings() {
+  const { profile, updatePreferredTranslation } = useUser();
   const [userSelection, setUserSelection] = useState(''); // user's selected translation
   const [previewText, setPreviewText] = useState(''); // romans 5:8 string
   const [saving, setSaving] = useState(false); // track saving of preferred translation
 
   // useEffect for intial page open
   useEffect(() => {
-    getPreferredTranslation()
-    .then(abbrev => setUserSelection(abbrev));
-  }, []);
+    if (profile?.preferredTranslation) {
+      setUserSelection(profile.preferredTranslation);
+    }
+  }, [profile?.preferredTranslation]);
 
   // useEffect for updating verse preview
   useEffect(() => {
@@ -36,21 +33,12 @@ function Settings() {
     .catch(() => setPreviewText('Could not load preview.'));
   }, [userSelection]);
 
-  /**
-   * handleChange for saving user's selection
-   * @param {*} e 
-   * @returns 
-   */
   const handleChange = async (e) => {
-      const user = auth.currentUser;
-
       const val = e.target.value;
       setUserSelection(val);
-
-      if (!user) return;
       setSaving(true);
       try {
-        setPreferredTranslation(val);
+        await updatePreferredTranslation(val);
       } catch (err) {
         console.error("Error saving translation:", err);
       } finally {
@@ -61,9 +49,15 @@ function Settings() {
   // return UI components
   return (
     <div className="page-container">
-      <div className="modern-card settings-card">
+      <div className="modern-card settings-card" style={{ position: 'relative' }}>
         <h1 className="title">Settings</h1>
         <p className="subtitle">Translation {saving && '— Saving...'}</p>
+        
+        <div style={{ position: 'absolute', top: '24px', right: '20px' }}>
+          <HelpModal title="Settings">
+            <p><strong>Translations:</strong> Select your preferred Bible translation. This translation will be used as the default for all your Typing Drills and Lists.</p>
+          </HelpModal>
+        </div>
 
         <select value={userSelection} onChange={handleChange} className="settings-select">
           {Object.entries(TRANSLATIONS).map(([val, label]) => (

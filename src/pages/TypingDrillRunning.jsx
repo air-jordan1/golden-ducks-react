@@ -34,7 +34,7 @@ function blankOutWords(text, difficulty) {
 }
 
 // Drilling screen
-function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
+function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, currentPassage, currentReference, level, onBack, drillMode, finalTranscript, listening, resetTranscript, translation }) {
   return (
     <div style={{ width: '100%' }}>
       {/* Running time info */}
@@ -47,8 +47,13 @@ function TypingDrillRunning({ time, inputRef, handleKeyDown, handleSubmit, curre
         </span>
         <span className="label-text">Time: {time}s</span>
       </div>
+
+      <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a1209', marginBottom: '16px', textAlign: 'center' }}>
+        {currentReference}
+      </h2>
+
       {/* Verse Reference + Input field */}
-      {drillMode === 'simple' && simpleInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript)}
+      {(drillMode === 'simple') && simpleInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode, finalTranscript, listening, resetTranscript)}
       {drillMode === 'overlay' && overlayInputMode(currentPassage, levelIdToName(level), inputRef, handleKeyDown, handleSubmit, drillMode)}
       <button className="btn-modern" onClick={handleSubmit} style={{ marginTop: '16px', width: '100%' }}>Submit Result</button>
       <button className="btn-modern" onClick={onBack} style={{ marginTop: '10px', width: '100%' }}>Back</button>

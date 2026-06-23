@@ -37,7 +37,7 @@ const Login = () => {
         } catch (error) {
           console.error("Error creating user profile:", error);
         }
-        navigate(`/welcome/${encodeURIComponent(user.email)}`);
+        navigate(`/welcome/${encodeURIComponent(user.email)}`, { viewTransition: true });
       } else {
         setIsCheckingAuth(false);
       }

@@ -131,21 +131,35 @@ function TypingDrillResults(params) {
       <WordDiff userInput={params.userInput} target={params.currentPassage} normalize={params.normalize} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <button className="btn-modern" style={{ width: '100%' }} onClick={params.onRetry}>
-          Try again
-        </button>
-        {params.levelCompleted && params.level < maxLevel && (
-          <button
-            className="btn-modern"
-            style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
-            onClick={params.onNextLevel}
-          >
-            Advance to Level {params.level + 1}
-          </button>
+        {params.customFooter ? params.customFooter : (
+          <>
+            <button className="btn-modern" style={{ width: '100%' }} onClick={params.onRetry}>
+              Try again
+            </button>
+            {params.hasNextVerse ? (
+              <button
+                className="btn-modern"
+                style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
+                onClick={params.onNextVerse}
+              >
+                Next Verse in List
+              </button>
+            ) : (
+              params.levelCompleted && params.level < maxLevel && (
+                <button
+                  className="btn-modern"
+                  style={{ backgroundColor: '#111827', color: '#ffffff', border: 'none', width: '100%' }}
+                  onClick={params.onNextLevel}
+                >
+                  Advance to Level {params.level + 1}
+                </button>
+              )
+            )}
+            <button className="btn-modern" style={{ width: '100%' }} onClick={params.onRestart}>
+              Try a Different Verse
+            </button>
+          </>
         )}
-        <button className="btn-modern" style={{ width: '100%' }} onClick={params.onRestart}>
-          Try a Different Verse
-        </button>
       </div>
     </div>
   );

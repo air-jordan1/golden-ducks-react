@@ -1,25 +1,51 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Welcome from "./pages/Welcome";
-import TypingDrill from "./pages/TypingDrill";
-import Account from "./pages/Account";
-import Settings from "./pages/Settings";
-import AppLayout from "./pages/components/AppLayout";
+import React, { Suspense } from 'react';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { UserProvider } from './context/UserContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import Loader from './components/Loader';
 
+// Lazy loading pages
+const Login = React.lazy(() => import('./pages/Login'));
+const Welcome = React.lazy(() => import('./pages/Welcome'));
+const Account = React.lazy(() => import('./pages/Account'));
+const Settings = React.lazy(() => import('./pages/Settings'));
+const TypingDrill = React.lazy(() => import('./pages/TypingDrill'));
+const Lists = React.lazy(() => import('./pages/Lists'));
+const ReferenceQuiz = React.lazy(() => import('./pages/ReferenceQuiz'));
+const TestModule = React.lazy(() => import('./pages/TestModule'));
+const Friends = React.lazy(() => import('./pages/Friends'));
+const AppLayout = React.lazy(() => import('./pages/components/AppLayout'));
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Login />,
+  },
+  {
+    element: <AppLayout />,
+    children: [
+      { path: "/welcome/:email", element: <Welcome /> },
+      { path: "/welcome", element: <Welcome /> },
+      { path: "/typing-drill", element: <TypingDrill /> },
+      { path: "/account", element: <Account /> },
+      { path: "/settings", element: <Settings /> },
+      { path: "/lists", element: <Lists /> },
+      { path: "/reference-quiz", element: <ReferenceQuiz /> },
+      { path: "/test", element: <TestModule /> },
+      { path: "/friends", element: <Friends /> },
+    ],
+  },
+]);
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route element={<AppLayout />}>
-          <Route path="/welcome/:email" element={<Welcome />} />
-          <Route path="/typing-drill" element={<TypingDrill />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <UserProvider>
+        <Suspense fallback={<Loader />}>
+          <RouterProvider router={router} />
+        </Suspense>
+      </UserProvider>
+    </ErrorBoundary>
   );
 }
 

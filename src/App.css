@@ -635,8 +635,7 @@ body {
 }
 
 .account-col-right {
-  max-height: 480px;
-  overflow-y: auto;
+  /* No internal scroll, let the page scroll naturally */
 }
 
 @media (max-width: 768px) {
@@ -1346,4 +1345,124 @@ a {
 
 .empty-state-btn:hover {
   background: #6b0000;
+}
+
+/* ============================================================
+   DIALOG / MODAL (HelpModal)
+   ============================================================ */
+
+.glass-dialog {
+  border: 1px solid rgba(232, 221, 212, 0.5);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  color: #1a1209;
+}
+
+.glass-dialog::backdrop {
+  background-color: rgba(26, 18, 9, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.glass-dialog-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  color: #1a1209;
+}
+
+.glass-dialog-close {
+  background: #faf8f5;
+  border: 1px solid #e8ddd4;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b5c4e;
+  transition: all 0.2s;
+}
+
+.glass-dialog-close:hover {
+  background: #f5ede0;
+  color: #1a1209;
+}
+
+.help-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b8a898;
+  transition: transform 0.2s, color 0.2s;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-btn:hover {
+  transform: scale(1.1);
+  color: #8b0000;
+}
+/* --- Sidebar Collapsed Modifier --- */
+.sidebar--collapsed {
+  width: 64px !important;
+}
+
+.sidebar--collapsed .sidebar-header span,
+.sidebar--collapsed .sidebar-item span,
+.sidebar--collapsed .sidebar-user {
+  display: none;
+}
+
+.sidebar--collapsed .sidebar-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar--collapsed .sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+}
+
+.sidebar--collapsed .sidebar-divider {
+  margin: 0;
+}
+
+.sidebar--collapsed .sidebar-footer {
+  padding: 10px;
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

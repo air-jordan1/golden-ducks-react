@@ -119,4 +119,86 @@ async function getTranslationId(abbrev) {
     };
 }
 
+export async function fetchChaptersForBook(translation, bookId) {
+  const bibleId = await getTranslationId(translation);
+  const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
+  const res = await fetch(`${base}/books/${bookId}/chapters`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+  if (!res.ok) throw new Error();
+  const data = await res.json();
+  return data.data.filter(c => c.number !== 'intro');
+}
+
+export async function fetchVersesForChapter(translation, chapterId) {
+  const bibleId = await getTranslationId(translation);
+  const base = `https://rest.api.bible/v1/bibles/${bibleId}`;
+  const res = await fetch(`${base}/chapters/${chapterId}/verses`, { headers: { 'api-key': import.meta.env.VITE_BIBLE_API_KEY }});
+  if (!res.ok) throw new Error();
+  const data = await res.json();
+  return data.data;
+}
+
+export async function getRandomVerse(translation, bookId = null, chapterId = null) {
+  let finalBookId = bookId;
+  let finalChapterId = chapterId;
+
+  if (!finalBookId || finalBookId === 'ANY') {
+    const uniqueBookIds = [...new Set(map.values())];
+    finalBookId = uniqueBookIds[Math.floor(Math.random() * uniqueBookIds.length)];
+  }
+
+  if (!finalChapterId || finalChapterId === 'ANY') {
+    const chapters = await fetchChaptersForBook(translation, finalBookId);
+    if (chapters.length === 0) throw new Error("No chapters found");
+    const randomChapter = chapters[Math.floor(Math.random() * chapters.length)];
+    finalChapterId = randomChapter.id;
+  }
+
+  const verses = await fetchVersesForChapter(translation, finalChapterId);
+  if (verses.length === 0) throw new Error("No verses found");
+  const randomVerse = verses[Math.floor(Math.random() * verses.length)];
+
+  const parsed = parseReference(randomVerse.reference);
+  const text = await fetchPassage(parsed, translation);
+
+  return {
+    reference: randomVerse.reference,
+    text: text
+  };
+}
+
+export function generateDistractors(correctRef) {
+  const match = correctRef.match(/^(.+?)\s+(\d+):(\d+)(?:-(\d+))?$/);
+  if (!match) return [correctRef];
+
+  const bookName = match[1];
+  const chapter = parseInt(match[2]);
+  const verse = parseInt(match[3]);
+
+  const options = new Set([correctRef]);
+  const books = ["Genesis", "Exodus", "Psalms", "Proverbs", "Isaiah", "Matthew", "Mark", "Luke", "John", "Romans", "1 Corinthians", "Ephesians", "James", "Revelation"];
+
+  while (options.size < 4) {
+    const rand = Math.random();
+    let newRef = '';
+    if (rand < 0.4) {
+      const vDiff = Math.floor(Math.random() * 10) - 5;
+      const v = Math.max(1, verse + (vDiff === 0 ? 1 : vDiff));
+      newRef = `${bookName} ${chapter}:${v}`;
+    } else if (rand < 0.8) {
+      const cDiff = Math.floor(Math.random() * 5) - 2;
+      const c = Math.max(1, chapter + (cDiff === 0 ? 1 : cDiff));
+      newRef = `${bookName} ${c}:${verse}`;
+    } else {
+      const b = books[Math.floor(Math.random() * books.length)];
+      newRef = `${b} ${chapter}:${verse}`;
+    }
+    
+    if (newRef !== correctRef) {
+      options.add(newRef);
+    }
+  }
+  
+  return Array.from(options).sort(() => Math.random() - 0.5);
+}
+
 export { parseReference, parsedRefToID, fetchPassage, getTranslationId }
